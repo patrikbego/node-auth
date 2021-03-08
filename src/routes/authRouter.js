@@ -1,12 +1,12 @@
 const express = require('express');
 const passport = require('passport');
-const authService = require('../src/service/authService');
-const utils = require('../src/utils');
-const tokenService = require('../src/service/tokenService');
+const authService = require('../service/authService');
+const utils = require('../utils');
+const tokenService = require('../service/tokenService');
 
 const authRouter = express.Router();
 
-require('../src/service/passportService')();
+require('../service/passportService')();
 
 authRouter.route('/fb')
   .post(passport.authenticate('facebook-token',

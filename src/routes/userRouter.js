@@ -1,7 +1,7 @@
 const express = require('express');
-const utils = require('../src/utils');
-const tokenService = require('../src/service/tokenService');
-const userService = require('../src/service/userService');
+const utils = require('../utils');
+const tokenService = require('../service/tokenService');
+const userService = require('../service/userService');
 
 const userRouter = express.Router();
 

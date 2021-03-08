@@ -1,5 +1,5 @@
 const request = require('supertest');
-const server = require('../app');
+const server = require('../../app');
 
 describe('Test items router ', () => {
   afterAll(async (done) => {

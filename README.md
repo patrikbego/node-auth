@@ -124,6 +124,12 @@ environments.<env> = {
 ### Test execution
 `npm run test` or `jest --detectOpenHandles --collectCoverage .`
 
+### Running it with docker 
+`#docker rm -f $(docker ps -aq)`
+`#docker rmi -f $(docker images -a -q)`
+`docker build -t auth-node .`
+`docker run --name auth-node-api -d -p 8888:3005 auth-node`
+
 ### References
 (Express)[https://expressjs.com/en/guide/routing.html]
 (Jest)[https://jestjs.io/docs/en/getting-started.html]   

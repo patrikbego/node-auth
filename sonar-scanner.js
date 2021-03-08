@@ -14,7 +14,6 @@ sonarqubeScanner(
       // 'sonar.testExecutionReportPaths': 'coverage/test-reporter.xml',
       'sonar.projectKey': 'auth-node',
       'sonar.login': config.sonar.clientID,
-      // 'sonar.login': 'dc55a84082e2674d6eabd0a71a4e47448153ad63',
     },
   }, () => {
   },

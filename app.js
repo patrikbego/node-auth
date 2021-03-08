@@ -7,9 +7,9 @@ const express = require('express');
 const cors = require('cors');
 require('./src/service/passportService');
 const passport = require('passport');
-const authRouter = require('./routes/authRouter');
-const itemRouter = require('./routes/itemRouter');
-const userRouter = require('./routes/userRouter');
+const authRouter = require('./src/routes/authRouter');
+const itemRouter = require('./src/routes/itemRouter');
+const userRouter = require('./src/routes/userRouter');
 const tokenService = require('./src/service/tokenService');
 const utils = require('./src/utils');
 

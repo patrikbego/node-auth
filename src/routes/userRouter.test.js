@@ -1,11 +1,11 @@
 const request = require('supertest');
 const { Pool } = require('pg');
 const assert = require('assert');
-const server = require('../app');
-const mockObjects = require('../src/mockObjects');
-const sqlQueries = require('../src/repository/sql/sqlQueries');
-const mailgunService = require('../src/service/mailgunService');
-const { run } = require('../src/repository/objectRepository');
+const server = require('../../app');
+const mockObjects = require('../mockObjects');
+const sqlQueries = require('../repository/sql/sqlQueries');
+const mailgunService = require('../service/mailgunService');
+const { run } = require('../repository/objectRepository');
 
 describe('User router test', () => {
   // let pool;
