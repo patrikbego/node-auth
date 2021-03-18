@@ -116,7 +116,6 @@ const utils = {
   extractTokenFromHeaders(headers) {
     let token = '';
 
-    const list = {};
     const rc = headers.cookie;
     rc && rc.split(';').forEach((cookie) => {
       const parts = cookie.split('=');

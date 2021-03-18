@@ -25,10 +25,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const whitelist = ['http://localhost:3000', 'https://localhost'];
+const whitelist = ['http://localhost:3000', 'https://localhost', 'https://bego.tips', undefined];
 const dynamicCorsOptions = {
   origin(origin, callback) {
-    if (origin || !whitelist.indexOf(origin) !== -1) { // TODO check on /getItems form nextjs (is it true that since nextjs and nodejs are runing on same machine this is undefined)
+    if (origin || whitelist.indexOf(origin) !== -1) { // TODO check on /getItems form nextjs (is it true that since nextjs and nodejs are runing on same machine this is undefined)
       callback(null, true);
     } else {
       callback(new Error(`${origin} not allowed by CORSUS`));

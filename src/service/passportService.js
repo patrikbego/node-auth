@@ -1,7 +1,8 @@
 const passport = require('passport');
-const FacebookStrategy = require('passport-facebook-token');
+const FacebookTokenStrategy = require('passport-facebook-token');
 const JwtStrategy = require('passport-jwt').Strategy;
 const LocalStrategy = require('passport-local').Strategy;
+const GoogleTokenStrategy = require('passport-google-token').Strategy;
 const config = require('../../config.local');
 const userService = require('./userService');
 const utils = require('../utils');
@@ -27,12 +28,13 @@ module.exports = function () {
 
   const opts = {};
   opts.jwtFromRequest = cookieExtractor;
-  opts.secretOrKey = 'my-secret';
+  opts.secretOrKey = config.hashingSecret;
   // opts.issuer = 'accounts.examplesoft.com';
   // opts.audience = 'yoursite.net';
-  passport.use(new JwtStrategy(opts, (async (jwt, done) => {
+  passport.use('jwt', new JwtStrategy(opts, (async (jwt, done) => {
     const user = tokenService.getJwt(jwt);
-    done(null, user && user.length > 0 ? user[0] : null);
+    if (user) done(null, user && user.length > 0 ? user[0] : null);
+    else done(null, { message: 'Wrong Password' });
   })));
 
   passport.use(
@@ -63,10 +65,23 @@ module.exports = function () {
       },
     ),
   );
-  passport.use('facebook-token', new FacebookStrategy({
+
+  passport.use('facebook-token', new FacebookTokenStrategy({
     clientID: config.facebook.clientID,
     clientSecret: config.facebook.clientSecret,
     profileFields: ['id', 'email', 'link', 'locale', 'name', 'timezone', 'updated_time', 'verified', 'displayName'],
+  },
+  (async (accessToken, refreshToken, profile, done) => {
+    console.log(profile);
+    const user = await userService.createOrUpdateUser(null, profile);
+
+    done(null, user && user.length > 0 ? user[0] : null);
+  })));
+
+  passport.use('google-token', new GoogleTokenStrategy({
+    clientID: config.google.clientID,
+    clientSecret: config.google.clientSecret,
+    scope: 'email profile openid',
   },
   (async (accessToken, refreshToken, profile, done) => {
     console.log(profile);

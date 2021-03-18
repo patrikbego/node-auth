@@ -119,6 +119,7 @@ environments.<env> = {
 
 ### Code Quality
 `docker-compose -f docker-compose.sonar.yml up -d` - starts sonar (optional)
+`node sonar-scanner.js`
 `eslint .`
 
 ### Test execution

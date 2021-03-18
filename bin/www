@@ -55,16 +55,6 @@ httpsServer.listen(sport, () => {
 });
 
 /**
- * Listen on provided port, on all network interfaces.
- */
-
-httpServer.on('error', onError);
-httpServer.on('listening', onListening);
-
-httpsServer.on('error', onError);
-httpsServer.on('listening', onListening);
-
-/**
  * Event listener for HTTP server "error" event.
  */
 
@@ -103,4 +93,14 @@ function onListening() {
     : `port ${addr.port}`;
   debug(`Listening on ${bind}`);
 }
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+httpServer.on('error', onError);
+httpServer.on('listening', onListening);
+
+httpsServer.on('error', onError);
+httpsServer.on('listening', onListening);
+
 module.exports = server;

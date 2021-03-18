@@ -29,28 +29,25 @@ const userService = {
     console.log(`User creation failed: ${userData}`);
     return utils.responseObject(400, '', 'cu: User creation failed. cu');
   },
-  async createOrUpdateUser(pool, userData) {
-    const user = await userService.getUser(null, userData);
-    if (user.code === 200) {
-      return user.clientData;
-    }
+  async createOrUpdateUser(pool, userData) { // TODO add a check on fields and do update in case user data has changed
     const newUser = {
       provider: userData.provider,
       providerId: userData.id,
       firstName: userData.name.givenName,
       lastName: userData.name.familyName,
       email: userData.emails[0].value,
+      providerRaw: userData._raw,
     };
     console.log(`Creating user: ${userData}`);
     newUser.status = 'new';
-    newUser.password = utils.hash(userData.password);
-    if (await userRepository.exists(pool, { provider_id: newUser.providerId }, userService.table)) {
-      console.log('User with this id number already exists!');
+    // newUser.password = utils.hash(userData.password);
+    if (await userRepository.exists(pool, { provider_id: newUser.providerId }, userService.table)) {//TODO add also a check on email
+      console.log('User with this id number already exists!'); // TODO this will fail if user will provide different data later
       return userRepository.select(pool, { provider_id: newUser.providerId }, userService.table);
     }
     try {
-      if (await userRepository.create(pool, user, userService.table)) {
-        return userService.getUser(pool, userData);
+      if (await userRepository.create(pool, newUser, userService.table)) {
+        return userRepository.select(pool, { provider_id: newUser.providerId }, userService.table);
       }
     } catch (err) {
       console.log(`User creation failed: ${err}`);

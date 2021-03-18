@@ -13,9 +13,10 @@ const sqlQueries = {
           address       varchar(1000),
           role          varchar(100),
           last_login    timeStamp,
-          provider varchar(100),
-          provider_id          varchar(100),
-
+          provider      varchar(100),
+          provider_id   varchar(100),
+          provider_raw  varchar(10000),
+          
           status        varchar(100),
           created_date timestamptz,
           updated_date timestamptz
@@ -45,7 +46,7 @@ const sqlQueries = {
           confirmation_link  varchar(400),
           login_retry        int,
           login_ip           varchar(100),
-          
+
           status             varchar(100),
           created_date timestamptz,
           updated_date timestamptz
