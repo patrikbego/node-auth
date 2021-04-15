@@ -1,11 +1,13 @@
 {
   "name": "auth-node",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
     "sonar": "node sonar-scanner.js",
-    "test": "jest --coverage --runInBand ."
+    "test": "jest --coverage --runInBand --forceExit .",
+    "migrate-up": "knex --knexpath=src/repository/db-migrate.js --knexfile=src/repository/knexfile.js migrate:up",
+    "migrate-down": "knex --knexpath=src/repository/db-migrate.js --knexfile=src/repository/knexfile.js migrate:down"
   },
   "jest": {
     "testEnvironment": "node",

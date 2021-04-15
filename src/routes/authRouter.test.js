@@ -17,7 +17,7 @@ describe('Auth router test', () => {
       host: 'localhost',
       database: 'test',
       password: 'test',
-      port: 5432,
+      port: 5444,
       idleTimeoutMillis: 3000,
       connectionTimeoutMillis: 2000,
     });

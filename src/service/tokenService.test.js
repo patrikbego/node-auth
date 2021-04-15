@@ -18,7 +18,7 @@ const { run } = require('../repository/objectRepository');
 //   port: 5432,
 // });
 //
-// // const connectionString = `postgres://${process.env.POSTGRES_USER}:${process.env.POSTGRES_PASSWORD}@localhost:5432/${process.env.POSTGRES_DB}`;
+// // const connectionString = `postgres://${process.env.POSTGRES_USER}:${process.env.POSTGRES_PASSWORD}@localhost:5444/${process.env.POSTGRES_DB}`;
 // const connectionString = 'postgres://test:test@localhost:5432/test';
 
 describe('tokenService test', () => {
@@ -31,7 +31,7 @@ describe('tokenService test', () => {
       host: 'localhost',
       database: 'test',
       password: 'test',
-      port: 5432,
+      port: 5444,
       idleTimeoutMillis: 3000,
       connectionTimeoutMillis: 2000,
     });

@@ -14,11 +14,11 @@ const userService = require('./userService');
 //   host: 'localhost',
 //   database: 'test',
 //   password: 'test',
-//   port: 5432,
+//   port: 5444,
 // });
 //
-// // const connectionString = `postgres://${process.env.POSTGRES_USER}:${process.env.POSTGRES_PASSWORD}@localhost:5432/${process.env.POSTGRES_DB}`;
-// const connectionString = 'postgres://test:test@localhost:5432/test';
+// // const connectionString = `postgres://${process.env.POSTGRES_USER}:${process.env.POSTGRES_PASSWORD}@localhost:5444/${process.env.POSTGRES_DB}`;
+// const connectionString = 'postgres://test:test@localhost:5444/test';
 
 describe('userService test', () => {
   let pool;
@@ -29,7 +29,7 @@ describe('userService test', () => {
       host: 'localhost',
       database: 'test',
       password: 'test',
-      port: 5432,
+      port: 5444,
       idleTimeoutMillis: 3000,
       connectionTimeoutMillis: 2000,
     });
@@ -75,22 +75,25 @@ describe('userService test', () => {
   });
 
   test('create and select user test', async () => {
-    const objectIns = to.user;
-    const res = await userService.createUser(pool, objectIns);
-    expect(res.code).toBe(200);
-    expect(res.clientData.firstName).toBe(objectIns.firstName);
+    for (let i = 0; i < 1000; i++) {
+      const objectIns = to.user;
+      objectIns.phone = (i + objectIns.phone).substring(0, 99);
+      const res = await userService.createUser(pool, objectIns);
+      expect(res.code).toBe(200);
+      expect(res.clientData.firstName).toBe(objectIns.firstName);
 
-    objectIns.firstName = 'test';
-    const userU = await userService.updateUser(pool, objectIns);
-    expect(userU.code).toBe(200);
+      objectIns.firstName = 'test';
+      const userU = await userService.updateUser(pool, objectIns);
+      expect(userU.code).toBe(200);
 
-    const updatedUser = await userService.getUser(pool, objectIns);
-    expect(updatedUser.clientData.firstName).toBe('test');
+      const updatedUser = await userService.getUser(pool, objectIns);
+      expect(updatedUser.clientData.firstName).toBe('test');
 
-    const deletedUser = await userService.deleteUser(pool, objectIns);
-    expect(deletedUser.code).toBe(200);
+      const deletedUser = await userService.deleteUser(pool, objectIns);
+      expect(deletedUser.code).toBe(200);
 
-    const updatedDelUser = await userService.getUser(pool, objectIns);
-    expect(updatedDelUser.clientData.status).toBe('deleted');
+      const updatedDelUser = await userService.getUser(pool, objectIns);
+      expect(updatedDelUser.clientData.status).toBe('deleted');
+    }
   });
 });

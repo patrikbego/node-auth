@@ -13,7 +13,7 @@ ENV NODE_ENV $NODE_ENV
 COPY bin /usr/src/app/bin
 COPY public /usr/src/app/public
 COPY src /usr/src/app/src
-COPY views /usr/src/app/public
+COPY views /usr/src/app/views
 COPY package*.json /usr/src/app/
 COPY config.local.js /usr/src/app/
 COPY localhost.crt /usr/src/app/

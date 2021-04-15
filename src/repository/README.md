@@ -89,3 +89,7 @@ To undo the specified migration that was run:
 
 And that is pretty much it. We can add these commands to package.json scripts and execute them with npm which can later on be
 used in your deployment script or CI/CD pipelines.
+
+Refs:
+http://knexjs.org/
+https://www.rockyourcode.com/docker-postgres-knex-setup/

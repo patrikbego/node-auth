@@ -5,10 +5,11 @@ const config = require('../../config.local');
 module.exports = {
 
   development: {
-    client: 'postgresql',
+    client: 'pg',
     connection: {
       database: config.postgres.database,
       user: config.postgres.user,
+      port: config.postgres.port,
       password: config.postgres.password,
     },
     pool: {
@@ -22,7 +23,7 @@ module.exports = {
   },
 
   staging: {
-    client: 'postgresql',
+    client: 'pg',
     connection: {
       database: config.postgres.database,
       user: config.postgres.user,
@@ -51,10 +52,12 @@ module.exports = {
   },
 
   production: {
-    client: 'postgresql',
+    client: 'pg',
     connection: {
       database: config.postgres.database,
+      host: config.postgres.host,
       user: config.postgres.user,
+      port: config.postgres.port,
       password: config.postgres.password,
     },
     pool: {
@@ -63,6 +66,7 @@ module.exports = {
     },
     migrations: {
       tableName: 'knex_migrations',
+      directory: path.join(__dirname, 'migrations'),
     },
   },
 

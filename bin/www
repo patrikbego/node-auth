@@ -13,10 +13,10 @@ const app = require('../app');
 
 const privateKey = fs.readFileSync(config.ssl.pk, 'utf8');
 const certificate = fs.readFileSync(config.ssl.cert, 'utf8');
+
 /**
  * Normalize a port into a number, string, or false.
  */
-
 function normalizePort(val) {
   const port = parseInt(val, 10);
 
@@ -36,14 +36,12 @@ function normalizePort(val) {
 /**
  * Get port from environment and store in Express.
  */
-
 const port = normalizePort(process.env.PORT || config.httpPort);
 const sport = normalizePort(process.env.PORT || config.httpsPort);
 
 /**
  * Create HTTP server.
  */
-
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer({ key: privateKey, cert: certificate }, app);
 
@@ -57,7 +55,6 @@ httpsServer.listen(sport, () => {
 /**
  * Event listener for HTTP server "error" event.
  */
-
 function onError(error) {
   if (error.syscall !== 'listen') {
     throw error;
@@ -85,7 +82,6 @@ function onError(error) {
 /**
  * Event listener for HTTP server "listening" event.
  */
-
 function onListening() {
   const addr = httpServer.address();
   const bind = typeof addr === 'string'
@@ -93,10 +89,10 @@ function onListening() {
     : `port ${addr.port}`;
   debug(`Listening on ${bind}`);
 }
+
 /**
  * Listen on provided port, on all network interfaces.
  */
-
 httpServer.on('error', onError);
 httpServer.on('listening', onListening);
 
