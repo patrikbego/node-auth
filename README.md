@@ -132,9 +132,9 @@ environments.<env> = {
 `docker run --name auth-node-api -d -p 8888:3005 auth-node`
 
 ### References
-(Express)[https://expressjs.com/en/guide/routing.html]
+(Express)[https://expressjs.com/en/guide/routing.html]  
 (Jest)[https://jestjs.io/docs/en/getting-started.html]   
 (Postgres)[https://node-postgres.com/]   
-(Knex)[http://knexjs.org/]
-(Passport)[http://www.passportjs.org/docs/authenticate/]
+(Knex)[http://knexjs.org/]  
+(Passport)[http://www.passportjs.org/docs/authenticate/]  
 
