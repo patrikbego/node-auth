@@ -30,6 +30,9 @@ test('select tokens', async () => {
 });
 
 test('insert 10 tokens', async () => {
+  const userIns = to.user;
+  const uq = objectMapper.generateInsertString(userIns, usersTableName);
+  await db.raw(uq);
   const objectIns = to.token;
   for (let i = 0; i < 10; i++) {
     objectIns.token += i;
@@ -42,7 +45,7 @@ test('insert 10 tokens', async () => {
   expect(users.length).toEqual(10);
 });
 
-test('insert 10 users', async () => {
+test('insert 10 users + 1 from above test', async () => {
   const objectIns = to.user;
   for (let i = 0; i < 10; i++) {
     objectIns.firstName += i;
@@ -52,5 +55,5 @@ test('insert 10 users', async () => {
     await db.raw(query);
   }
   const users = await db.from(usersTableName).select('first_name');
-  expect(users.length).toEqual(10);
+  expect(users.length).toEqual(11);
 });

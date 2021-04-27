@@ -1,4 +1,4 @@
-const sqlQueries = {
+const sqlAuthQueries = {
   createUsersTable: `
       CREATE TABLE IF NOT EXISTS users
       (
@@ -30,6 +30,7 @@ const sqlQueries = {
           token   varchar(4000),
           expires bigint,
           phone   varchar(100),
+          email   varchar(100),
 
           status  varchar(100),
           created_date timestamptz,
@@ -54,4 +55,4 @@ const sqlQueries = {
   `,
 
 };
-module.exports = sqlQueries;
+module.exports = sqlAuthQueries;

@@ -14,8 +14,8 @@ describe('Test items router ', () => {
       .expect('Content-Length', '596')
       .expect(200)
       .end((err, res) => {
-        expect(res.body[0].title).toBe('Free');
         if (err) throw err;
+        expect(res.body[0].title).toBe('Free');
         done();
       });
   });

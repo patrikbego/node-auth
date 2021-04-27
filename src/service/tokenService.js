@@ -6,14 +6,14 @@ const userService = require('./userService');
 const tokenService = {
   table: 'tokens',
   async createToken(pool, userData) {
-    const phone = typeof (userData.phone) === 'string'
-    && userData.phone.trim().length > 7
-      ? userData.phone.trim() : '';
+    const email = typeof (userData.email) === 'string'
+    && userData.email.trim().length > 3
+      ? userData.email.trim() : '';
     const password = typeof (userData.password) === 'string'
     && userData.password.trim().length > 0
       ? userData.password.trim() : '';
 
-    if (phone
+    if (email
         && password
         && !(await objectRepository.exists(pool, { userId: userData.id }, tokenService.table))) {
       const userRes = await userService.getUser(pool, userData, true);
@@ -22,7 +22,7 @@ const tokenService = {
         const tokenId = utils.createRandomString(20);
         const expires = Date.now() + 1000 * 60 * 60;
         const tokenObject = {
-          phone,
+          email,
           token: tokenId,
           userId: userData.id,
           expires,
@@ -38,7 +38,7 @@ const tokenService = {
     return utils.responseObject(400, null, 'Token creation failed');
   },
   async updateToken(pool, data) {
-    if (data.phone && await tokenService.isTokenValid(pool, data.phone)) {
+    if (data.email && await tokenService.isTokenValid(data.email)) {
       const tokenRes = await tokenService.getToken(pool, data);
       const token = tokenRes.clientData;
       if (token.expires > Date.now()) {
@@ -52,33 +52,38 @@ const tokenService = {
     return utils.responseObject(400, null, 'Token update failed');
   },
   async getToken(pool, data) {
-    const isTokenValid = await tokenService.isTokenValid(pool, data.phone);
-    if (data.phone && isTokenValid) {
-      const result = await objectRepository.select(pool, { phone: data.phone, status: 'new' }, tokenService.table,
+    const isTokenValid = await tokenService.isTokenValid(data.email);
+    if (data.email && isTokenValid) {
+      const result = await objectRepository.select(pool, { email: data.email, status: 'new' }, tokenService.table,
         { id: 'desc' });
       return utils.responseObject(200, '', result.length > 0 ? result[0] : null); // TODO add some logic that prevents returning more than 1 result
     }
     return utils.responseObject(400, '', 'Could not retrieve token.');
   },
-  async isTokenValid(pool, phone) {
-    const token = (await objectRepository.select(pool, { phone }, tokenService.table, { id: 'desc' }))[0];
-    return token.phone === phone && token.expires > Date.now();
+  async isTokenValid(email) {
+    const token = (await objectRepository.select(null, { email }, tokenService.table, { id: 'desc' }))[0];
+    return token.email === email && token.expires > Date.now();
   },
-  async isRequestTokenValid(pool, headers) {
+  async isRequestTokenValid(headers) {
     const token = utils.extractTokenFromHeaders(headers);
-    return !!(token && (await tokenService.isTokenValid(pool, token.phone)));
+    return !!(token && (await tokenService.isJwtHeaderValid(token)));
   },
   async deleteToken(pool, data) {
-    if (data.phone
-        && await tokenService.isTokenValid(pool, data.phone)) {
-      await objectRepository.update(pool, { status: 'deleted' }, { phone: data.phone }, tokenService.table);
+    if (data.email
+        && await tokenService.isTokenValid(data.email)) {
+      await objectRepository.update(pool, { status: 'deleted' }, { email: data.email }, tokenService.table);
       return utils.responseObject(200, '', 'Token deleted successfully!');
     }
     return utils.responseObject(400, '', 'Could not retrieve token.');
   },
-  async isJwtValid(pool, phone) {
-    const token = (await objectRepository.select(pool, { phone }, tokenService.table, { id: 'desc' }))[0];
-    return token.phone === phone && token.expires > Date.now();
+  // Jwt Logic
+  async isJwtTokenValid(pool, email) {
+    const token = (await objectRepository.select(pool, { email }, tokenService.table, { id: 'desc' }))[0];
+    return token.email === email && token.expires > Date.now();
+  },
+  async isJwtHeaderValid(token) {
+    const decoded = tokenService.getJwt(token);
+    return decoded.id && decoded.exp > Date.now() / 1000;
   },
   createJwt(user) {
     return jwt.sign({

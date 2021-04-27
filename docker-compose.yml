@@ -1,0 +1,9 @@
+version:  '3'
+services:
+  auth-node:
+    restart: always
+    build: .
+    ports:
+      - 3005:3005
+    depends_on:
+      - pg_master

@@ -38,7 +38,7 @@ module.exports = function () {
   })));
 
   passport.use(
-    'login',
+    'domain-token',
     new LocalStrategy(
       {
         usernameField: 'email',
@@ -46,19 +46,18 @@ module.exports = function () {
       },
       async (email, password, done) => {
         try {
-          const user = await userService.getUser(null, { email }, false);
+          const user = await userService.getUser(null, { email }, true);
 
-          if (!user) {
+          if (!user || !user.clientData) {
             return done(null, false, { message: 'User not found' });
           }
 
-          const validate = await user.isValidPassword(password);
-
-          if (!validate) {
-            return done(null, false, { message: 'Wrong Password' });
+          if (user.clientData.password !== utils.hash(password)) {
+            return done(null, false, { message: 'Email or Password is not correct' });
           }
 
-          return done(null, user, { message: 'Logged in Successfully' });
+          user.clientData.password = '';
+          return done(null, user.clientData, { message: 'Logged in Successfully' });
         } catch (error) {
           return done(error);
         }

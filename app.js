@@ -12,6 +12,7 @@ const itemRouter = require('./src/routes/itemRouter');
 const userRouter = require('./src/routes/userRouter');
 const tokenService = require('./src/service/tokenService');
 const utils = require('./src/utils');
+const blogRouter = require('./src/routes/blogRouter');
 
 const app = express();
 
@@ -25,7 +26,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const whitelist = ['http://localhost:3000', 'https://localhost', 'https://bego.tips', undefined];
+const whitelist = ['http://localhost:3000', 'https://localhost',
+  'http://localhost:9199', 'https://bego.tips', undefined, 'https://cukin.fun'];
 const dynamicCorsOptions = {
   origin(origin, callback) {
     if (origin || whitelist.indexOf(origin) !== -1) { // TODO check on /getItems form nextjs (is it true that since nextjs and nodejs are runing on same machine this is undefined)
@@ -64,6 +66,7 @@ app.use(passport.initialize());
 
 app.use('/api/v1/auth', cors(dynamicCorsOptions), authRouter);
 app.use('/api/v1/user', cors(dynamicCorsOptions), userRouter);
+app.use('/api/v1/blog', cors(dynamicCorsOptions), blogRouter);
 app.use('/api/v1/', cors(dynamicCorsOptions), itemRouter);
 
 // catch 404 and forward to error handler

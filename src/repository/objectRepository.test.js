@@ -3,7 +3,7 @@ const assert = require('assert');
 const to = require('../mockObjects');
 
 const objectRepo = require('./objectRepository');
-const sqlQueries = require('./sql/sqlQueries');
+const sqlAuthQueries = require('./sql/sqlAuthQueries');
 
 describe('userRepository test', () => {
   let pool;
@@ -33,10 +33,10 @@ describe('userRepository test', () => {
       console.log('client removed: '); // your callback here
     });
     const client = await pool.connect();
-    const userQuery = sqlQueries.createUsersTable;
+    const userQuery = sqlAuthQueries.createUsersTable;
     const userRes = await client.query(userQuery);
     expect(userRes).toBeTruthy();
-    const tokeQuery = sqlQueries.createTokensTable;
+    const tokeQuery = sqlAuthQueries.createTokensTable;
     const tokenRes = await client.query(tokeQuery);
     expect(tokenRes).toBeTruthy();
     console.log('======> 1 beforeAll client has ended start <======');

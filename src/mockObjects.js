@@ -32,6 +32,24 @@ const testObject = {
     updatedDate: null,
     status: 'new',
   },
+  blog: {
+    userId: 1,
+    language: 'EN',
+    original: 'EN',
+    title: 'Test Title',
+    body: '\n'
+        + '# Heading level 1\n'
+        + '\n'
+        + '\n'
+        + '...\n'
+        + '\n'
+        + '###### Heading level 6\n',
+    tags: 'test foo bar',
+    published: true,
+    status: 'PUBLISHED',
+    created_date: new Date(),
+    updated_date: new Date(),
+  },
 };
 
 module.exports = testObject;

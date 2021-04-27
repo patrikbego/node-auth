@@ -11,7 +11,7 @@ const authService = {
     const reqUser = userService.validateUserObject(userData);
     const userRes = await userService.getUser(pool, userData, true);
     if (!userRes.clientData) {
-      return utils.responseObject(401, '', 'Phone or password is not correct!');
+      return utils.responseObject(401, '', 'Email or password is not correct!');
     }
 
     const authObject = {
@@ -39,8 +39,8 @@ const authService = {
     return utils.responseObject(401, '', 'Phone or password is not correct!');
   },
   async logout(pool, data) {
-    if (data.phone
-        && await tokenService.isTokenValid(pool, data.phone)) {
+    if (data.email
+        && await tokenService.isTokenValid(data.email)) {
       const result = await tokenService.deleteToken(pool, data);
       return utils.responseObject(result.code, result.serverData,
         result.clientData);

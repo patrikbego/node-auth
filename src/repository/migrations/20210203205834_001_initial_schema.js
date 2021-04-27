@@ -1,9 +1,9 @@
-const sqlQueries = require('../sql/sqlQueries');
+const sqlAuthQueries = require('../sql/sqlAuthQueries');
 
 exports.up = async function (knex) {
-  await knex.raw(sqlQueries.createUsersTable);
-  await knex.raw(sqlQueries.createTokensTable);
-  await knex.raw(sqlQueries.createAuthTable);
+  await knex.raw(sqlAuthQueries.createUsersTable);
+  await knex.raw(sqlAuthQueries.createTokensTable);
+  await knex.raw(sqlAuthQueries.createAuthTable);
 };
 
 exports.down = async function (knex) {

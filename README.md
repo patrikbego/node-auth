@@ -39,7 +39,7 @@ The project contains following source files:
 │   │   ├── objectRepository.test.js
 │   │   ├── seeds
 │   │   ├── sql
-│   │   │   └── sqlQueries.js // DDL queries
+│   │   │   └── sqlAuthQueries.js // DDL queries
 │   │   └── utils
 │   │       ├── objectMapper.js // orm mapper
 │   │       └── objectMapper.test.js

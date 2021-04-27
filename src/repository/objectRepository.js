@@ -67,10 +67,16 @@ const objectRepository = {
   async run(pool, query) {
     pool = objectRepository.getPool(pool);
     const client = await pool.connect();
+    const result = [];
     try {
       const res = await client.query(query);
       console.log(res);
       console.log(`${query} run successfully`);
+      for (const row of res.rows) {
+        console.log(row);
+        result.push(objectMapper.remapFromSqlObject(row));
+      }
+      return result;
     } catch (err) {
       console.trace(`Query failed ${err}`);
       throw err;

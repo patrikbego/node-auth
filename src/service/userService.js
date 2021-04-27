@@ -1,5 +1,5 @@
 const utils = require('../utils');
-const userRepository = require('../repository/objectRepository');
+const objectRepository = require('../repository/objectRepository');
 
 const userService = {
   table: 'users',
@@ -10,15 +10,12 @@ const userService = {
     user.status = 'new';
     if ((user.phone || user.email) && user.password && user.tosAgreement) {
       user.password = utils.hash(userData.password);
-      if (await userRepository.exists(pool, { phone: user.phone }, userService.table)) {
+      if (await objectRepository.exists(pool, { phone: user.phone }, userService.table)) {
         return utils.responseObject(400, '',
           'User with this phone number already exists!');
       }
       try {
-        console.log(
-          `Creating user: ${user.firstName} ${user.lastName}`,
-        );
-        if (await userRepository.create(pool, user, userService.table)) {
+        if (await objectRepository.create(pool, user, userService.table)) {
           return userService.getUser(pool, userData);
         }
       } catch (err) {
@@ -41,13 +38,13 @@ const userService = {
     console.log(`Creating user: ${userData}`);
     newUser.status = 'new';
     // newUser.password = utils.hash(userData.password);
-    if (await userRepository.exists(pool, { provider_id: newUser.providerId }, userService.table)) {//TODO add also a check on email
+    if (await objectRepository.exists(pool, { provider_id: newUser.providerId }, userService.table)) {//TODO add also a check on email
       console.log('User with this id number already exists!'); // TODO this will fail if user will provide different data later
-      return userRepository.select(pool, { provider_id: newUser.providerId }, userService.table);
+      return objectRepository.select(pool, { provider_id: newUser.providerId }, userService.table);
     }
     try {
-      if (await userRepository.create(pool, newUser, userService.table)) {
-        return userRepository.select(pool, { provider_id: newUser.providerId }, userService.table);
+      if (await objectRepository.create(pool, newUser, userService.table)) {
+        return objectRepository.select(pool, { provider_id: newUser.providerId }, userService.table);
       }
     } catch (err) {
       console.log(`User creation failed: ${err}`);
@@ -58,12 +55,12 @@ const userService = {
     return utils.responseObject(400, '', 'cu: User creation failed. cu');
   },
   async getUser(pool, userData, getPassword) {
-    if (userData && userData.phone) {
-      const phone = typeof (userData.phone) === 'string'
-    && userData.phone.trim().length > 7 ? userData.phone.trim() : false;
+    if (userData && userData.email) {
+      const email = typeof (userData.email) === 'string'
+    && userData.email.trim().length > 3 ? userData.email.trim() : false;
       try {
-        console.log(`Retrieving user: ${phone}`);
-        const user = (await userRepository.select(pool, { phone }, userService.table))[0];
+        console.log(`Retrieving user: ${email}`);
+        const user = (await objectRepository.select(pool, { email }, userService.table))[0];
         if (!getPassword) {
           user.password = '';
         }
@@ -77,7 +74,7 @@ const userService = {
       && userData.email.trim().length > 3 ? userData.email.trim() : false;
       try {
         console.log(`Retrieving user: ${email}`);
-        const user = (await userRepository.select(pool, { email }, userService.table))[0];
+        const user = (await objectRepository.select(pool, { email }, userService.table))[0];
         if (!getPassword) {
           user.password = '';
         }
@@ -93,11 +90,11 @@ const userService = {
     console.log(`Updating user: ${userData.firstName} ${userData.lastName}`);
     // const user = userService.validateUserObject(userData);
     const user = userData;
-    const exists = await userRepository.exists(pool, { phone: user.phone }, userService.table);
+    const exists = await objectRepository.exists(pool, { phone: user.phone }, userService.table);
     if (user.phone
         && user.tosAgreement
         && exists) {
-      const originalUser = (await userRepository.select(pool,
+      const originalUser = (await objectRepository.select(pool,
         { phone: user.phone }, userService.table))[0];
       console.log(
         `Updating user: ${user.firstName} ${user.lastName}`,
@@ -105,12 +102,12 @@ const userService = {
       if (originalUser.phone !== user.phone) {
         utils.responseObject(400, '', 'Phone number can\'t  be updated!');
       }
-      if (user.password && originalUser.password !== user.password.trim()) {
+      if (user.password && originalUser.password !== utils.hash(user.password.trim())) {
         utils.responseObject(400, '', 'Requested data can\'t  be updated!');
       }
       try {
         user.password = originalUser.password;
-        await userRepository.update(pool, user, { id: originalUser.id }, userService.table);
+        await objectRepository.update(pool, user, { id: originalUser.id }, userService.table);
         return utils.responseObject(200, '', 'User has been updated successfully!');
       } catch (e) {
         return utils.responseObject(500, '', 'User update failed!');
@@ -119,7 +116,7 @@ const userService = {
     return utils.responseObject(500, '', 'User fields missing!');
   },
   async getAllUsers(pool, createdAfterNrOfDays) {
-    const result = await userRepository.select(pool, undefined, userService.table);
+    const result = await objectRepository.select(pool, undefined, userService.table);
     const userList = result.clientData;
     const betweenList = [];
     if (createdAfterNrOfDays) {
@@ -135,7 +132,7 @@ const userService = {
       createdAfterNrOfDays ? betweenList : userList);
   },
   async getByEmail(pool, email) {
-    const result = await userRepository.select(pool, { email }, userService.table);
+    const result = await objectRepository.select(pool, { email }, userService.table);
     for (let i = 0; i < result.length; i += 1) {
       const user = result[i];
       if (user.email.toLowerCase().trim() === email.toLowerCase().trim()) {

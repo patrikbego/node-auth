@@ -40,6 +40,25 @@ module.exports = {
   },
 
   test: {
+    client: 'pg',
+    connection: {
+      user: 'test',
+      host: 'localhost',
+      database: 'test',
+      password: 'test',
+      port: 5444,
+    },
+    pool: {
+      min: 2,
+      max: 10,
+    },
+    migrations: {
+      tableName: 'knex_migrations',
+      directory: path.join(__dirname, 'migrations'),
+    },
+  },
+
+  sqlite3: {
     client: 'sqlite3',
     connection: ':memory:',
     useNullAsDefault: true,
