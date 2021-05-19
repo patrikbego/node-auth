@@ -3,6 +3,7 @@ const FacebookTokenStrategy = require('passport-facebook-token');
 const JwtStrategy = require('passport-jwt').Strategy;
 const LocalStrategy = require('passport-local').Strategy;
 const GoogleTokenStrategy = require('passport-google-token').Strategy;
+const HeaderStrategy = require('passport-http-header-strategy').Strategy;
 const config = require('../../config.local');
 const userService = require('./userService');
 const utils = require('../utils');
@@ -39,12 +40,15 @@ module.exports = function () {
 
   passport.use(
     'domain-token',
-    new LocalStrategy(
-      {
-        usernameField: 'email',
-        passwordField: 'password',
-      },
-      async (email, password, done) => {
+    new HeaderStrategy(
+      { header: 'authorization', passReqToCallback: true },
+      async (req, token, done) => {
+        const base64Credentials = req.headers.authorization.split(' ')[1];
+        const credentials = Buffer.from(base64Credentials, 'base64')
+          .toString('ascii');
+        const [email, password] = credentials.split(':');
+        // let resObject = authService.login({ phone: username, password })
+
         try {
           const user = await userService.getUser(null, { email }, true);
 

@@ -20,9 +20,10 @@ describe('BlogService test', () => {
 
   test('create and search for blog test', async () => {
     const userIns = to.user;
-    await userService.createUser(pool, userIns);
+    const user = await userService.createUser(pool, userIns);
     for (let i = 0; i < 1; i++) {
       let objectIns = to.blog;
+      objectIns.userId = user.clientData.id;
       const res = await blogService.create(pool, objectIns);
       expect(res.code).toBe(200);
       expect(res.clientData[0].title).toBe(objectIns.title);

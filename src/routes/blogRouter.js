@@ -6,24 +6,24 @@ const tokenService = require('../service/tokenService');
 
 const blogRouter = express.Router();
 
-blogRouter.get('/getBlog',
+blogRouter.get('/getBlog/:id',
+  async (req, res) => {
+    const resObject = await utils.requestWrapper(blogService.readById, req.params, req.headers,
+      tokenService.isRequestTokenValid, false);
+    res.status(resObject.code).json(resObject.clientData);
+  });
+
+blogRouter.get('/getBlogs',
   async (req, res) => {
     const resObject = await utils.requestWrapper(blogService.read, req.body, req.headers,
       tokenService.isRequestTokenValid, true);
     res.status(resObject.code).json(resObject.clientData);
   });
 
-blogRouter.get('/getUserBlogs',
+blogRouter.get('/getAllBlogs',
   async (req, res) => {
     const resObject = await utils.requestWrapper(blogService.read, req.body, req.headers,
-      tokenService.isRequestTokenValid, true);
-    res.status(resObject.code).json(resObject.clientData);
-  });
-
-blogRouter.get('/getAllBlogs', passport.authenticate('jwt', { session: false }),
-  async (req, res) => {
-    const resObject = await utils.requestWrapper(blogService.read, req.body, req.headers,
-      tokenService.isRequestTokenValid, true);
+      tokenService.isRequestTokenValid, false);
     res.status(resObject.code).json(resObject.clientData);
   });
 

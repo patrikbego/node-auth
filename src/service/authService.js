@@ -48,6 +48,7 @@ const authService = {
   },
   async signUp(pool, userData, test) {
     const userRes = await userService.createUser(pool, userData);
+    if (userRes.code !== 200) return userRes;
     const tokenRes = await tokenService.createToken(pool, userData);
     const confirmationToken = `${tokenRes.clientData.token}&email=${userData.email}&phone=${userData.phone}`;
     const link = `http://localhost:3000/confirmEmail?token=${confirmationToken}`; // TODO consider hashing the link

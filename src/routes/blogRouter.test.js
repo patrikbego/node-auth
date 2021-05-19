@@ -39,7 +39,7 @@ describe('User router test', () => {
           .post('/api/v1/auth/signin')
           .send(mockObjects.user)
           .set('Accept', 'application/json')
-          .set('Authorization', 'Basic YXRlc3RAYXRlc3QuY29tOnBhc3MxMjM=')
+          .set('Authorization', 'Bearer YXRlc3RAYXRlc3QuY29tOnBhc3MxMjM=')
           .expect('Content-Type', /json/)
           .expect(200)
           .end((err, res) => {
@@ -59,8 +59,22 @@ describe('User router test', () => {
                 mockObjects.blog.id = 1;
 
                 request(server)
-                  .get('/api/v1/blog/getBlog')
+                  .get('/api/v1/blog/getBlogs')
                   .send({ query: 'Test' })
+                  .set('Accept', 'application/json')
+                  .expect('Content-Type', /json/)
+                  .set('cookie', cookie)
+                  .expect(200)
+                  .end((err, res) => {
+                    if (err) return done(err);
+                    expect(res.body[0].body).toContain('###### Heading level 6');
+                    server.close(done);
+                    return done();
+                  });
+
+                request(server)
+                  .get('/api/v1/blog/getAllBlogs')
+                  // .send({ query: 'Test' })
                   .set('Accept', 'application/json')
                   .expect('Content-Type', /json/)
                   .set('cookie', cookie)

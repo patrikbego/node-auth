@@ -20,7 +20,7 @@ const tokenService = {
 
       if (utils.hash(password) === userRes.clientData.password) {
         const tokenId = utils.createRandomString(20);
-        const expires = Date.now() + 1000 * 60 * 60;
+        const expires = Date.now() + 1000 * 60 * 5;
         const tokenObject = {
           email,
           token: tokenId,
@@ -66,7 +66,8 @@ const tokenService = {
   },
   async isRequestTokenValid(headers) {
     const token = utils.extractTokenFromHeaders(headers);
-    return !!(token && (await tokenService.isJwtHeaderValid(token)));
+    return token && (await tokenService.isJwtHeaderValid(token))
+      ? tokenService.getJwt(token) : null;
   },
   async deleteToken(pool, data) {
     if (data.email
@@ -91,7 +92,7 @@ const tokenService = {
       user,
     }, 'my-secret',
     {
-      expiresIn: 60 * 120,
+      expiresIn: 60 * 5,
     });
   },
   generateJwt(req, res, next) {

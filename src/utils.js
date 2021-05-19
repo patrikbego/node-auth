@@ -98,9 +98,15 @@ const utils = {
   ) {
     try {
       if (authRequired) {
-        const isTokenValid = await isRequestTokenValid(headers);
-        if (!isTokenValid) {
+        const token = await isRequestTokenValid(headers);
+        if (!token) {
           return utils.responseObject(401, '', 'Unauthorized!');
+        }
+        // in case of user object we need to set just id all the rest user_id
+        if (func.name.toLowerCase().includes('user')) {
+          data.id = token.user.id;
+        } else {
+          data.userId = token.user.id;
         }
       }
       const result = await func(pool, data);

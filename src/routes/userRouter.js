@@ -6,7 +6,7 @@ const userService = require('../service/userService');
 
 const userRouter = express.Router();
 
-userRouter.get('/getUser', passport.authenticate('jwt', { session: false }),
+userRouter.get('/getUser', passport.authenticate('domain-token', { session: false }),
   async (req, res) => {
     res.status(200);
   });

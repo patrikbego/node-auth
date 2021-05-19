@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "sonar": "node sonar-scanner.js",
-    "test": "jest --coverage --runInBand --forceExit .",
+    "test": "jest --coverage --runInBand --forceExit --bail .",
     "migrate-up": "knex --knexpath=src/repository/db-migrate.js --knexfile=src/repository/knexfile.js migrate:up",
     "migrate-down": "knex --knexpath=src/repository/db-migrate.js --knexfile=src/repository/knexfile.js migrate:down"
   },
@@ -23,6 +23,7 @@
     "cors": "^2.8.5",
     "debug": "~2.6.9",
     "express": "~4.16.1",
+    "helmet": "^4.6.0",
     "http-errors": "~1.6.3",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.21.17",
@@ -30,10 +31,11 @@
     "passport": "^0.4.1",
     "passport-facebook-token": "^4.0.0",
     "passport-google-token": "^0.1.2",
+    "passport-http-header-strategy": "^1.1.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "pg": "^8.5.1",
-    "pug": "2.0.0-beta11",
+    "pug": "^3.0.1",
     "sqlite3": "^5.0.1"
   },
   "devDependencies": {

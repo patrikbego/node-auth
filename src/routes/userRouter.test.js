@@ -6,7 +6,6 @@ const db = require('../repository/db-migrate');
 const tokenService = require('../service/tokenService');
 
 describe('User router test', () => {
-
   jest.setTimeout(30000);
 
   beforeAll(async () => {
@@ -26,7 +25,7 @@ describe('User router test', () => {
     jwtSpy.mockReturnValue('Some test email');
 
     const jwtSpy1 = jest.spyOn(tokenService, 'isRequestTokenValid');
-    jwtSpy1.mockReturnValue(true);
+    jwtSpy1.mockReturnValue({ user: { id: 1 } });
 
     request(server)
       .post('/api/v1/auth/signup')
@@ -42,7 +41,7 @@ describe('User router test', () => {
           .post('/api/v1/auth/signin')
           .send(mockObjects.user)
           .set('Accept', 'application/json')
-          .set('Authorization', 'Basic MTIzMTIzMTIzMTIzOnBhc3MxMjM=')
+          .set('Authorization', 'Bearer YXRlc3RAYXRlc3QuY29tOnBhc3MxMjM=')
           .expect('Content-Type', /json/)
           .expect(200)
           .end((err, res) => {

@@ -3,6 +3,7 @@ const passport = require('passport');
 const authService = require('../service/authService');
 const utils = require('../utils');
 const tokenService = require('../service/tokenService');
+const jwt = require('jsonwebtoken');
 
 const authRouter = express.Router();
 
@@ -43,15 +44,8 @@ async (req, res, next) => {
 }, tokenService.generateJwt, tokenService.sendJwt);
 
 authRouter.post('/signin', async (req, res, next) => {
-  const base64Credentials = req.headers.authorization.split(' ')[1];
-  const credentials = Buffer.from(base64Credentials, 'base64')
-    .toString('ascii');
-  const [username, password] = credentials.split(':');
-  // let resObject = authService.login({ phone: username, password })
-  const data = { email: username, password };
-
-  passport.authenticate('domain-token',
-    { session: false, scope: ['profile email'] }, (err, user, info) => {
+  passport.authenticate('domain-token', { session: false, failWithError: true },
+    (err, user, info) => {
       console.log('domain passport user', user);
       console.info('domain passport info', info);
       console.error('domain passport error', err);
@@ -78,6 +72,24 @@ authRouter.post('/confirmEmail', async (req, res) => {
     req.body, req.headers,
     tokenService.isRequestTokenValid, false);
   res.status(resObject.code).json(resObject.clientData);
+});
+
+const refreshTokens = {};
+const SECRET = 'hard secret';
+
+authRouter.post('/token', (req, res, next) => {
+  const { username } = req.body;
+  const { refreshToken } = req.body;
+  if ((refreshToken in refreshTokens) && (refreshTokens[refreshToken] === username)) {
+    const user = {
+      username,
+      role: 'admin',
+    };
+    const token = jwt.sign(user, SECRET, { expiresIn: 300 });
+    res.json({ token: `JWT ${token}` });
+  } else {
+    res.send(401);
+  }
 });
 
 module.exports = authRouter;

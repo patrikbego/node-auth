@@ -24,7 +24,7 @@ const testObject = {
   },
   auth: {
     tokenId: 1,
-    userId: 1,
+    // userId: 1, // parsed from cookie
     confirmationLink: `http://localhost:3000/${this.token}`,
     loginRetry: 0,
     loginIp: '127.0.0.1',
@@ -33,7 +33,7 @@ const testObject = {
     status: 'new',
   },
   blog: {
-    userId: 1,
+    // userId: 1, // parsed from cookie
     language: 'EN',
     original: 'EN',
     title: 'Test Title',

@@ -29,6 +29,8 @@ exports.up = async function (knex) {
   await knex.raw('CREATE TRIGGER insert_new_full_text_search\n'
       + '  BEFORE INSERT ON blog\n'
       + '  FOR EACH ROW EXECUTE PROCEDURE set_full_text_search_on_blog()');
+
+  // await knex.raw('ALTER TABLE tokens ADD COLUMN email varchar(100)');
 };
 
 exports.down = async function (knex) {
