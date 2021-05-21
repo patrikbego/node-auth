@@ -1,33 +1,45 @@
-const objectMapper = {
-  generateUpdateString(setObjects, table, whereObject) {
-    const sqlSetObject = objectMapper.remapToSqlObject(setObjects);
+const objectParamMapper = {
+  // const text = 'INSERT INTO users(name, email) VALUES($1, $2) RETURNING *'
+  // const values = ['brianc', 'brian.m.carlson@gmail.com']
+
+  generateUpdateString(setObjects, whereObject, table) {
+    const sqlSetObject = objectParamMapper.remapToSqlObject(setObjects);
     const setObjectValuesArray = Object.values(sqlSetObject);
     const setObjectKeysArray = Object.keys(sqlSetObject);
 
     let updateString = `update ${table} SET `;
-    for (let i = 0; i < setObjectKeysArray.length; i++) {
+    let i = 0;
+    for (; i < setObjectKeysArray.length; i++) {
       if (i !== 0) {
-        updateString += `, ${setObjectKeysArray[i]} = ${objectMapper.stringifyValues(setObjectValuesArray[i])}`;
+        updateString += `, ${setObjectKeysArray[i]} = $${i + 1}`;
       } else {
-        updateString += ` ${setObjectKeysArray[i]} = ${objectMapper.stringifyValues(setObjectValuesArray[i])}`;
+        updateString += ` ${setObjectKeysArray[i]} = $${i + 1}`;
       }
     }
 
     updateString = `${updateString} where `;
-    const sqlWhereObject = objectMapper.remapToSqlObject(whereObject);
+    const sqlWhereObject = objectParamMapper.remapToSqlObject(whereObject);
     const whereObjectValuesArray = Object.values(sqlWhereObject);
-    const wehreObjectKeysArray = Object.keys(sqlWhereObject);
-    for (let i = 0; i < wehreObjectKeysArray.length; i++) {
-      if (i !== 0) {
-        updateString += ` AND ${wehreObjectKeysArray[i]} = ${objectMapper.stringifyValues(whereObjectValuesArray[i])}`;
+    const whereObjectKeysArray = Object.keys(sqlWhereObject);
+    for (let j = 0; j < whereObjectKeysArray.length; j++) {
+      if (j !== 0) {
+        updateString += ` AND ${whereObjectKeysArray[j]} = $${i + 1} `;
       } else {
-        updateString += `${wehreObjectKeysArray[i]} = ${objectMapper.stringifyValues(whereObjectValuesArray[i])}`;
+        updateString += `${whereObjectKeysArray[j]} = $${i + 1} `;
       }
     }
-    return `${updateString};`;
+    return {
+      text: updateString,
+      whereValues: whereObjectValuesArray.map(
+        (x) => objectParamMapper.stringifyValues(x),
+      ),
+      setValues: setObjectValuesArray.map(
+        (x) => objectParamMapper.stringifyValues(x),
+      ),
+    };
   },
   generateInsertString(object, table) {
-    const sqlObject = objectMapper.remapToSqlObject(object);
+    const sqlObject = objectParamMapper.remapToSqlObject(object);
     const objectValuesArray = Object.values(sqlObject);
     const objectKeysArray = Object.keys(sqlObject);
 
@@ -42,51 +54,60 @@ const objectMapper = {
     insertString = `${insertString}) values (`;
     for (let i = 0; i < objectKeysArray.length; i++) {
       if (i !== 0) {
-        insertString += `, ${objectMapper.stringifyValues(objectValuesArray[i])}`;
+        insertString += `, $${i + 1}`;
       } else {
-        insertString += ` ${objectMapper.stringifyValues(objectValuesArray[i])}`;
+        insertString += ` $${i + 1}`;
       }
     }
-    return `${insertString});`;
+    return {
+      text: `${insertString}) RETURNING *;`,
+      values: objectValuesArray.map((x) => objectParamMapper.stringifyValues(x)),
+    };
   },
   generateSelectString(whereObject, orderByObject, table) {
     if (!whereObject) {
-      return `select * from ${table}`;
+      return { text: `select * from ${table}` };
     }
-    const sqlWhereObject = objectMapper.remapToSqlObject(whereObject);
-    const sqlOrderByObject = objectMapper.remapToSqlObject(orderByObject);
+    const sqlWhereObject = objectParamMapper.remapToSqlObject(whereObject);
+    const sqlOrderByObject = objectParamMapper.remapToSqlObject(orderByObject);
     const objectValuesArray = Object.values(sqlWhereObject);
     const objectKeysArray = Object.keys(sqlWhereObject);
     const orderObjectValuesArray = Object.values(sqlOrderByObject);
     const orderObjectKeysArray = Object.keys(sqlOrderByObject);
 
     let selectString = `SELECT * FROM ${table} `;
-    for (let i = 0; i < objectKeysArray.length; i++) {
+    let i = 0;
+    for (; i < objectKeysArray.length; i++) {
       if (i === 0) {
-        selectString += ` WHERE ${objectKeysArray[i]} = ${objectMapper.stringifyValues(
-          objectValuesArray[i],
-        )}`;
+        selectString += ` WHERE ${objectKeysArray[i]} = $${i + 1}`;
       } else {
-        selectString += ` AND ${objectKeysArray[i]} = ${objectMapper.stringifyValues(
-          objectValuesArray[i],
-        )}`;
+        selectString += ` AND ${objectKeysArray[i]} = $${i + 1}`;
       }
     }
-    for (let i = 0; i < orderObjectKeysArray.length; i++) {
-      if (i === 0) {
-        selectString += ` ORDER BY ${orderObjectKeysArray[i]} ${orderObjectValuesArray[i]}`;
+    for (let j = 0; j < orderObjectKeysArray.length; j++) {
+      const orderDir = orderObjectValuesArray[i] === 'desc' ? 'desc' : 'asc';
+      if (j === 0) {
+        selectString += ` ORDER BY ${orderObjectKeysArray[j]} ${orderDir}`;
       } else {
-        selectString += ` AND ${orderObjectKeysArray[i]} ${orderObjectValuesArray[i]}`;
+        selectString += ` AND ${orderObjectKeysArray[j]} ${orderDir}`;
       }
     }
-    return `${selectString};`;
+    return {
+      text: `${selectString}`,
+      whereValues: objectValuesArray.map(
+        (x) => objectParamMapper.stringifyValues(x),
+      ),
+      orderValues: orderObjectValuesArray.map(
+        (x) => objectParamMapper.stringifyValues(x),
+      ),
+    };
   },
   stringifyValues(value) {
     if (value && value instanceof Date) return `'${value.toISOString()}'`;
     if (typeof value === 'undefined') return null;
     if (typeof value === 'boolean') return value;
     if (typeof value === 'number') return value;
-    if (typeof value === 'string') return `'${value}'`;
+    if (typeof value === 'string') return `${value}`;
     if (value === null) return null;
     if (typeof value === 'bigint' || typeof value === 'symbol'
         || typeof value === 'object') return value;
@@ -148,4 +169,4 @@ const objectMapper = {
   },
 };
 
-module.exports = objectMapper;
+module.exports = objectParamMapper;

@@ -37,7 +37,7 @@ const blogService = {
         blogs = await objectRepository.run(pool, `SELECT *
                                                            FROM blog
                                                            WHERE status not in ('deleted')
-                                                             and tokens @@ plainto_tsquery('${query}')`);
+                                                             and tokens @@ plainto_tsquery($1)`, [query]);
       } else {
         blogs = await objectRepository.run(pool,
           'SELECT * FROM blog WHERE status not in (\'deleted\') limit 100');
@@ -53,10 +53,9 @@ const blogService = {
       let blog;
       if (queryObject && queryObject.id) {
         console.log(`Retrieving blogs for query: ${queryObject.id}`);
-        blog = await objectRepository.run(pool, `SELECT *
-                                                     FROM blog
-                                                     WHERE status not in ('deleted')
-                                                       and id = ${queryObject.id}`);
+        blog = await objectRepository.run(pool, `SELECT * FROM blog 
+                        WHERE status not in ('deleted')  and id = $1`,
+        [queryObject.id]);
 
         return utils.responseObject(200, '', blog.length > 0 ? blog[0] : blog);
       }

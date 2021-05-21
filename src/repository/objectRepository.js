@@ -1,6 +1,6 @@
 const assert = require('assert');
 const { Pool } = require('pg');
-const objectMapper = require('./utils/objectMapper');
+const objectParamMapper = require('./utils/objectParamMapper');
 const config = require('../../config.local');
 
 const objectRepository = {
@@ -21,11 +21,11 @@ const objectRepository = {
   },
   async create(pool, object, table) {
     pool = objectRepository.getPool(pool);
-    const query = objectMapper.generateInsertString(object, table);
+    const query = objectParamMapper.generateInsertString(object, table);
     // (async function () {
     const client = await pool.connect();
     try {
-      await client.query(query);
+      await client.query(query.text, query.values);
       return object;
     } catch (err) {
       console.trace(`insert failed ${err}`);
@@ -40,16 +40,16 @@ const objectRepository = {
   },
   async select(pool, whereObject, table, orderByObject) {
     pool = objectRepository.getPool(pool);
-    const query = objectMapper.generateSelectString(whereObject, orderByObject, table);
+    const query = objectParamMapper.generateSelectString(whereObject, orderByObject, table);
     // (async function () {
     const client = await pool.connect();
     const result = [];
     try {
-      console.log(`running query ${query}`);
-      const res = await client.query(query);
+      console.log(`running query ${query.text}`, query.whereValues, query.orderValues);
+      const res = await client.query(query.text, query.whereValues);
       for (const row of res.rows) {
         console.log(row);
-        result.push(objectMapper.remapFromSqlObject(row));
+        result.push(objectParamMapper.remapFromSqlObject(row));
       }
       return result;
     } catch (err) {
@@ -64,17 +64,17 @@ const objectRepository = {
       console.log('======> select client has ended <======');
     }
   },
-  async run(pool, query) {
+  async run(pool, query, paramsArray) {
     pool = objectRepository.getPool(pool);
     const client = await pool.connect();
     const result = [];
     try {
-      const res = await client.query(query);
+      const res = await client.query(query, paramsArray);
       console.log(res);
       console.log(`${query} run successfully`);
       for (const row of res.rows) {
         console.log(row);
-        result.push(objectMapper.remapFromSqlObject(row));
+        result.push(objectParamMapper.remapFromSqlObject(row));
       }
       return result;
     } catch (err) {
@@ -90,11 +90,11 @@ const objectRepository = {
   },
   async update(pool, setObject, whereObject, table) {
     pool = objectRepository.getPool(pool);
-    const query = objectMapper.generateUpdateString(setObject, table, whereObject);
+    const query = objectParamMapper.generateUpdateString(setObject, whereObject, table);
     console.log('running query ', query);
     const client = await pool.connect();
     try {
-      await client.query(query);
+      await client.query(query.text, query.setValues ? query.setValues.concat(query.whereValues) : query.whereValues);
     } catch (err) {
       console.trace(`Update failed ${err}`);
       throw err;

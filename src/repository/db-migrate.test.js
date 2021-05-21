@@ -1,5 +1,5 @@
 const db = require('./db-migrate');
-const objectMapper = require('./utils/objectMapper');
+const objectParamMapper = require('./utils/objectParamMapper');
 const to = require('../mockObjects');
 
 // eslint-disable-next-line max-len
@@ -31,15 +31,15 @@ test('select tokens', async () => {
 
 test('insert 10 tokens', async () => {
   const userIns = to.user;
-  const uq = objectMapper.generateInsertString(userIns, usersTableName);
-  await db.raw(uq);
+  const iq = objectParamMapper.generateInsertString(userIns, usersTableName);
+  await db.raw(iq.text.replace(/[$]\d\d?/g, '?'), iq.values);///[$]\d\d?/g knex does not work with $1 param same as pg
   const objectIns = to.token;
   for (let i = 0; i < 10; i++) {
     objectIns.token += i;
     objectIns.token.substring(0, 100);
-    const query = objectMapper.generateInsertString(objectIns, tokens);
+    const query = objectParamMapper.generateInsertString(objectIns, tokens);
     console.log(`running ${query}`);
-    await db.raw(query);
+    await db.raw(query.text.replace(/[$]\d\d?/g, '?'), query.values);///[$]\d\d?/g knex does not work with $1 param same as pg
   }
   const users = await db.from(tokens).select('id');
   expect(users.length).toEqual(10);
@@ -50,9 +50,9 @@ test('insert 10 users + 1 from above test', async () => {
   for (let i = 0; i < 10; i++) {
     objectIns.firstName += i;
     objectIns.firstName.substring(0, 100);
-    const query = objectMapper.generateInsertString(objectIns, usersTableName);
+    const query = objectParamMapper.generateInsertString(objectIns, usersTableName);
     console.log(`running ${query}`);
-    await db.raw(query);
+    await db.raw(query.text.replace(/[$]\d\d?/g, '?'), query.values);///[$]\d\d?/g knex does not work with $1 param same as pg
   }
   const users = await db.from(usersTableName).select('first_name');
   expect(users.length).toEqual(11);
