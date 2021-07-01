@@ -7,7 +7,7 @@ const userService = {
     console.log(`Creating user: ${userData.firstName} ${userData.lastName}`);
 
     const user = userService.validateUserObject(userData);
-    user.status = 'new';
+    user.status = 'NEW';
     if ((user.phone || user.email) && user.password && user.tosAgreement) {
       user.password = utils.hash(userData.password);
       if (await objectRepository.exists(pool, { phone: user.phone }, userService.table)) {
@@ -44,7 +44,7 @@ const userService = {
       providerRaw: userData._raw,
     };
     console.log(`Creating user: ${userData}`);
-    newUser.status = 'new';
+    newUser.status = 'NEW';
     // newUser.password = utils.hash(userData.password);
     if (await objectRepository.exists(pool,
       { provider_id: newUser.providerId }, userService.table)) { // TODO add also a check on email
@@ -101,13 +101,15 @@ const userService = {
     // const user = userService.validateUserObject(userData);
     const user = userData;
     const originalUser = (await objectRepository.select(pool, { id: user.id }, userService.table))[0];
-    if (await objectRepository.exists(pool, { user_name: user.userName }, userService.table)) {
+    if (originalUser.userName !== user.userName
+        && await objectRepository.exists(pool, { user_name: user.userName }, userService.table)) {
       return utils.responseObject(400, '',
         'User with this username already exists!');
     }
     originalUser.userName = user.userName;
     originalUser.firstName = user.firstName;
     originalUser.lastName = user.lastName;
+    originalUser.status = user.status;
     console.log(
       `Updating user: ${user.firstName} ${user.lastName}`,
     );

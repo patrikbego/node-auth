@@ -39,7 +39,7 @@ describe('BlogService test', () => {
       expect(delB.code).toBe(200);
 
       const updatedDelBlog = await blogService.read(pool, { query: 'foo' });
-      expect(updatedDelBlog.clientData.length).toBe(0);
+      expect(updatedDelBlog.clientData.length).toBe(1);
     }
   });
 

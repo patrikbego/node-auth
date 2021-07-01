@@ -20,7 +20,7 @@ const authService = {
       loginRetry: 1,
       createdDate: new Date(),
       updatedDate: null,
-      status: 'new',
+      status: 'NEW',
     };
     await authService.createAuth(pool, authObject);
 
@@ -28,7 +28,7 @@ const authService = {
         && userRes.clientData.password === utils.hash(reqUser.password)) {
       userRes.clientData.password = '';
       await tokenService.createToken(pool, userData);
-      await authService.markAsDeleted(pool, userRes.clientData, { userId: userRes.clientData.id, loginRetry: 1, status: 'new' });
+      await authService.markAsDeleted(pool, userRes.clientData, { userId: userRes.clientData.id, loginRetry: 1, status: 'NEW' });
 
       const responseObject = {
         user: userRes.clientData,
@@ -59,7 +59,7 @@ const authService = {
       confirmationLink: link,
       createdDate: new Date(),
       updatedDate: null,
-      status: 'new',
+      status: 'NEW',
     };
 
     await authService.createAuth(pool, authObject);
@@ -83,11 +83,11 @@ const authService = {
     }
     // send confirmation email
     const userRes = await userService.getUser(pool,
-      { phone: tokenRes.clientData.phone }, true);
+      { email: tokenRes.clientData.email }, true);
     const user = userRes.clientData;
-    user.status = 'confirmed';
+    user.status = 'CONFIRMED';
     await tokenService.deleteToken(pool, data);
-    await authService.markAsDeleted(pool, userRes.clientData, { userId: userRes.clientData.id, status: 'new' });
+    await authService.markAsDeleted(pool, userRes.clientData, { userId: userRes.clientData.id, status: 'NEW' });
     await userService.updateUser(pool, user);
     return utils.responseObject(200, '', 'Email confirmed');
   },

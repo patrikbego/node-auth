@@ -6,17 +6,17 @@ const to = require('../mockObjects');
 // NODE_ENV=development jest --detectOpenHandles /Users/pb/develop/tutorials/nodejs-tutorial/src/repository/db-migrate.test.js
 const tokens = 'tokens';
 const usersTableName = 'users';
+jest.setTimeout(300000);
 beforeAll(async () => {
-  // run the migrations and do any other setup here
-  await db.migrate.up();
-  console.log('Migrating up');
+  await db.migrate.latest();
 });
 
-afterAll(async () => {
-  // run the migrations and do any other setup here
-  await db.migrate.down();
+afterAll(async (done) => {
+  await db.migrate.rollback();
   await db.destroy();
   console.log('Migrating down');
+  // server.close();
+  done();
 });
 
 test('select users', async () => {

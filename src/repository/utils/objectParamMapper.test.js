@@ -23,8 +23,8 @@ describe('postgres test', () => {
 
   it('object insert mapper', () => {
     const insertString = objectParamMapper.generateInsertString(object, 'users');
-    expect(insertString.text).toBe('insert into users ( first_name , last_name , phone , email , password , tos_agreement , address , status , role , last_login , created_date , updated_date ) values ( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *;');
-    expect(insertString.values.length).toBe(12);
+    expect(insertString.text).toBe('insert into users ( first_name , last_name , user_name , phone , email , password , tos_agreement , address , status , role , last_login , created_date , updated_date ) values ( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *;');
+    expect(insertString.values.length).toBe(13);
     expect(insertString.values[0]).toBe('pb');
     console.log(insertString);
   });

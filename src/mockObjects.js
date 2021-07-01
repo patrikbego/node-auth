@@ -2,12 +2,13 @@ const testObject = {
   user: {
     firstName: 'pb',
     lastName: null,
+    userName: 'pb',
     phone: '123123123123',
     email: 'atest@atest.com',
     password: 'pass123',
     tosAgreement: true,
     address: undefined,
-    status: 'new',
+    status: 'NEW',
     role: 'user',
     lastLogin: new Date(),
     createdDate: new Date(),
@@ -17,7 +18,7 @@ const testObject = {
     user_id: 1,
     token: 'djv3kgm99o5c9cku2b5b',
     phone: '123123123123',
-    status: 'new',
+    status: 'NEW',
     expires: Date.now() + 6000,
     createdDate: new Date(),
     updatedDate: new Date(),
@@ -30,7 +31,7 @@ const testObject = {
     loginIp: '127.0.0.1',
     createdDate: new Date(),
     updatedDate: null,
-    status: 'new',
+    status: 'NEW',
   },
   blog: {
     // userId: 1, // parsed from cookie

@@ -28,7 +28,7 @@ const tokenService = {
           expires,
           createdDate: new Date(),
           updatedDate: null,
-          status: 'new',
+          status: 'NEW',
         };
         // TODO consider retrieving the token here
         await objectRepository.create(pool, tokenObject, tokenService.table);
@@ -54,7 +54,7 @@ const tokenService = {
   async getToken(pool, data) {
     const isTokenValid = await tokenService.isTokenValid(data.email);
     if (data.email && isTokenValid) {
-      const result = await objectRepository.select(pool, { email: data.email, status: 'new' }, tokenService.table,
+      const result = await objectRepository.select(pool, { email: data.email, status: 'NEW' }, tokenService.table,
         { id: 'desc' });
       return utils.responseObject(200, '', result.length > 0 ? result[0] : null); // TODO add some logic that prevents returning more than 1 result
     }

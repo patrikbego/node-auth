@@ -25,13 +25,14 @@ describe('AuthService test', () => {
 
     const signupRes = await authService.signUp(pool, objectIns, true);
     expect(signupRes.code).toBe(200);
-    expect((await authService.getAllAuths(pool, { userId: 1, status: 'new' })).clientData.length)
+    expect((await authService.getAllAuths(pool, { userId: 1, status: 'NEW' })).clientData.length)
       .toBe(1);
 
+    objectIns.id = 1; // quick assumption
     const updatedUser = await userService.getUser(pool, objectIns);
     const user = updatedUser.clientData;
     expect(user.firstName).toBe('pb');
-    expect(user.status).toBe('new');
+    expect(user.status).toBe('NEW');
 
     const tokenDres = await tokenService.getToken(pool, { email: user.email });
     expect(parseInt(tokenDres.clientData.expires, 10)).toBeGreaterThan(Date.now());
@@ -42,7 +43,7 @@ describe('AuthService test', () => {
 
     const loginRes = await authService.login(pool, objectIns);
     expect(loginRes.code).toBe(200);
-    const auths = await authService.getAllAuths(pool, { userId: 1, loginRetry: 1, status: 'deleted' });
+    const auths = await authService.getAllAuths(pool, { userId: 1, loginRetry: 1, status: 'DELETED' });
     expect(auths.clientData.length).toBe(1);
 
     //TODO fix this
