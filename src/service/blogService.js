@@ -48,6 +48,16 @@ const blogService = {
       return utils.responseObject(500, '', 'Could not retrieve data!');
     }
   },
+  async readByStatus(pool, statuses) {
+    try {
+      const blogs = await objectRepository.run(pool,
+        `SELECT * FROM blog WHERE status in (${statuses.map((num) => `'${num.toString()}'`).toString()}) limit 100`);
+      return utils.responseObject(200, '', blogs);
+    } catch (err) {
+      console.error(`Blog creation failed: ${err}`);
+      return utils.responseObject(500, '', 'Could not retrieve data!');
+    }
+  },
   async readById(pool, queryObject) {
     try {
       let blog;
@@ -86,7 +96,7 @@ const blogService = {
     }
     postObject = blog[0];
     postObject.tokens = null; // tokens get auto generated - not really needed, but tokens cant be updated manually
-    postObject.status = 'deleted';
+    postObject.status = 'DELETED';
     await objectRepository.update(pool, postObject, { id },
       blogService.table);
     return utils.responseObject(200, '',

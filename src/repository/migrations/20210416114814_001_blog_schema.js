@@ -30,7 +30,7 @@ exports.up = async function (knex) {
       + '  BEFORE INSERT ON blog\n'
       + '  FOR EACH ROW EXECUTE PROCEDURE set_full_text_search_on_blog()');
 
-  // await knex.raw('ALTER TABLE tokens ADD COLUMN email varchar(100)');
+  await knex.raw('ALTER TABLE users ADD COLUMN user_name varchar(100)');
 };
 
 exports.down = async function (knex) {
@@ -39,4 +39,5 @@ exports.down = async function (knex) {
   await knex.raw('DROP FUNCTION set_full_text_search_on_blog');
   await knex.raw('DROP TABLE blog');
   await knex.raw('DROP TABLE blog_history');
+  await knex.raw('ALTER TABLE users DROP COLUMN user_name');
 };

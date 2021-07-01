@@ -72,7 +72,7 @@ const tokenService = {
   async deleteToken(pool, data) {
     if (data.email
         && await tokenService.isTokenValid(data.email)) {
-      await objectRepository.update(pool, { status: 'deleted' }, { email: data.email }, tokenService.table);
+      await objectRepository.update(pool, { status: 'DELETED' }, { email: data.email }, tokenService.table);
       return utils.responseObject(200, '', 'Token deleted successfully!');
     }
     return utils.responseObject(400, '', 'Could not retrieve token.');

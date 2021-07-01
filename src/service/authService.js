@@ -96,7 +96,7 @@ const authService = {
       const auths = await authService.getAllAuths(pool, whereObject);
       if (auths.clientData) {
         for (const loginRetry of auths.clientData) {
-          await objectRepository.update(pool, { status: 'deleted' },
+          await objectRepository.update(pool, { status: 'DELETED' },
             { id: loginRetry.id },
             authService.table);
         }

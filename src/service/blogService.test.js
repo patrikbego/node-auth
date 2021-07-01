@@ -42,4 +42,13 @@ describe('BlogService test', () => {
       expect(updatedDelBlog.clientData.length).toBe(0);
     }
   });
+
+  test('array to string', async () => {
+    const nums = ['1', 2, 2, 'bobi', 3, 'loli', 5, 6];
+    const allToStr = nums.map((num) => `'${num.toString()}'`).toString();
+    console.log(allToStr);
+
+    const res = nums.forEach((e, i) => { console.log(e, i); return `'${e}'`; });
+    console.log(res);
+  });
 });

@@ -22,7 +22,7 @@ blogRouter.get('/getBlogs',
 
 blogRouter.get('/getAllBlogs',
   async (req, res) => {
-    const resObject = await utils.requestWrapper(blogService.read, req.body, req.headers,
+    const resObject = await utils.requestWrapper(blogService.readByStatus, ['PUBLISHED'], req.headers,
       tokenService.isRequestTokenValid, false);
     res.status(resObject.code).json(resObject.clientData);
   });

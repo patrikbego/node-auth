@@ -1,6 +1,7 @@
 // Dependencies
 const crypto = require('crypto');
 const https = require('https');
+const { validationResult } = require('express-validator');
 const config = require('../config.local');
 
 // Container for all the helpers
@@ -91,6 +92,36 @@ const utils = {
     }
     console.log(str);
     return str;
+  },
+
+  async newRequestWrapper(
+    func, req, headers, isRequestTokenValid, authRequired, pool,
+  ) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return utils.responseObject(400, '', { errors: errors.array() });
+      }
+      if (authRequired) {
+        const token = await isRequestTokenValid(headers);
+        if (!token) {
+          return utils.responseObject(401, '', 'Unauthorized!');
+        }
+        // in case of user object we need to set just id all the rest user_id
+        if (func.name.toLowerCase().includes('user')) {
+          req.data.id = token.user.id;
+        } else {
+          req.data.userId = token.user.id;
+        }
+      }
+      const result = await func(pool, req.data);
+      return utils.responseObject(result.code, result.serverData, result.clientData);
+    } catch (err) {
+      const message = `Request processing failed: ${err}`;
+      console.error(message);
+      console.trace(err);
+      return utils.responseObject(400, '', message);
+    }
   },
 
   async requestWrapper(

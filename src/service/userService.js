@@ -14,6 +14,14 @@ const userService = {
         return utils.responseObject(400, '',
           'User with this phone number already exists!');
       }
+      if (await objectRepository.exists(pool, { email: user.email }, userService.table)) {
+        return utils.responseObject(400, '',
+          'User with this email already exists!');
+      }
+      if (await objectRepository.exists(pool, { user_name: user.username }, userService.table)) {
+        return utils.responseObject(400, '',
+          'User with this username already exists!');
+      }
       try {
         if (await objectRepository.create(pool, user, userService.table)) {
           return userService.getUser(pool, userData);
@@ -38,13 +46,15 @@ const userService = {
     console.log(`Creating user: ${userData}`);
     newUser.status = 'new';
     // newUser.password = utils.hash(userData.password);
-    if (await objectRepository.exists(pool, { provider_id: newUser.providerId }, userService.table)) {//TODO add also a check on email
+    if (await objectRepository.exists(pool,
+      { provider_id: newUser.providerId }, userService.table)) { // TODO add also a check on email
       console.log('User with this id number already exists!'); // TODO this will fail if user will provide different data later
       return objectRepository.select(pool, { provider_id: newUser.providerId }, userService.table);
     }
     try {
       if (await objectRepository.create(pool, newUser, userService.table)) {
-        return objectRepository.select(pool, { provider_id: newUser.providerId }, userService.table);
+        return objectRepository.select(pool,
+          { provider_id: newUser.providerId }, userService.table);
       }
     } catch (err) {
       console.log(`User creation failed: ${err}`);
@@ -90,30 +100,23 @@ const userService = {
     console.log(`Updating user: ${userData.firstName} ${userData.lastName}`);
     // const user = userService.validateUserObject(userData);
     const user = userData;
-    const exists = await objectRepository.exists(pool, { phone: user.phone }, userService.table);
-    if (user.phone
-        && user.tosAgreement
-        && exists) {
-      const originalUser = (await objectRepository.select(pool,
-        { phone: user.phone }, userService.table))[0];
-      console.log(
-        `Updating user: ${user.firstName} ${user.lastName}`,
-      );
-      if (originalUser.phone !== user.phone) {
-        utils.responseObject(400, '', 'Phone number can\'t  be updated!');
-      }
-      if (user.password && originalUser.password !== utils.hash(user.password.trim())) {
-        utils.responseObject(400, '', 'Requested data can\'t  be updated!');
-      }
-      try {
-        user.password = originalUser.password;
-        await objectRepository.update(pool, user, { id: originalUser.id }, userService.table);
-        return utils.responseObject(200, '', 'User has been updated successfully!');
-      } catch (e) {
-        return utils.responseObject(500, '', 'User update failed!');
-      }
+    const originalUser = (await objectRepository.select(pool, { id: user.id }, userService.table))[0];
+    if (await objectRepository.exists(pool, { user_name: user.userName }, userService.table)) {
+      return utils.responseObject(400, '',
+        'User with this username already exists!');
     }
-    return utils.responseObject(500, '', 'User fields missing!');
+    originalUser.userName = user.userName;
+    originalUser.firstName = user.firstName;
+    originalUser.lastName = user.lastName;
+    console.log(
+      `Updating user: ${user.firstName} ${user.lastName}`,
+    );
+    try {
+      await objectRepository.update(pool, originalUser, { id: user.id }, userService.table);
+      return utils.responseObject(200, '', 'User has been updated successfully!');
+    } catch (e) {
+      return utils.responseObject(500, '', 'User update failed!');
+    }
   },
   async getAllUsers(pool, createdAfterNrOfDays) {
     const result = await objectRepository.select(pool, undefined, userService.table);
@@ -143,7 +146,7 @@ const userService = {
   },
   async deleteUser(pool, userData) {
     console.log(`Marking user as deleted: ${userData.email}`);
-    userData.status = 'deleted';
+    userData.status = 'DELETED';
     return userService.updateUser(pool, userData);
   },
   // TODO add correct validation and return validData in the object
@@ -154,6 +157,9 @@ const userService = {
     const lastName = typeof (userData.lastName) === 'string'
     && userData.lastName.trim().length > 0
       ? userData.lastName.trim() : '';
+    const userName = typeof (userData.userName) === 'string'
+    && userData.userName.trim().length > 0
+      ? userData.userName.trim() : '';
     const phone = typeof (userData.phone) === 'string'
     && userData.phone.trim().length > 3
       ? userData.phone.trim() : '';
@@ -178,6 +184,7 @@ const userService = {
     return {
       firstName,
       lastName,
+      userName,
       phone,
       email,
       password,

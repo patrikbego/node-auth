@@ -36,7 +36,7 @@ describe('userService test', () => {
       expect(deletedUser.code).toBe(200);
 
       const updatedDelUser = await userService.getUser(pool, objectIns);
-      expect(updatedDelUser.clientData.status).toBe('deleted');
+      expect(updatedDelUser.clientData.status).toBe('DELETED');
     }
   });
 });

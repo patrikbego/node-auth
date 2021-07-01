@@ -1,9 +1,10 @@
 const express = require('express');
 const passport = require('passport');
+const jwt = require('jsonwebtoken');
+const { check } = require('express-validator');
 const authService = require('../service/authService');
 const utils = require('../utils');
 const tokenService = require('../service/tokenService');
-const jwt = require('jsonwebtoken');
 
 const authRouter = express.Router();
 
@@ -43,22 +44,24 @@ async (req, res, next) => {
   next();
 }, tokenService.generateJwt, tokenService.sendJwt);
 
-authRouter.post('/signin', async (req, res, next) => {
-  passport.authenticate('domain-token', { session: false, failWithError: true },
-    (err, user, info) => {
-      console.log('domain passport user', user);
-      console.info('domain passport info', info);
-      console.error('domain passport error', err);
-      req.user = user;
-      next();
-    })(req, res, next);
-},
-async (req, res, next) => {
-  if (!req.user) {
-    return res.status(401).send('User Not Authenticated');
-  }
-  next();
-}, tokenService.generateJwt, tokenService.sendJwt);
+authRouter.post('/signin',
+  check('email').isEmail().withMessage('Invalid email format'),
+  async (req, res, next) => {
+    passport.authenticate('domain-token', { session: false, failWithError: true },
+      (err, user, info) => {
+        console.log('domain passport user', user);
+        console.info('domain passport info', info);
+        console.error('domain passport error', err);
+        req.user = user;
+        next();
+      })(req, res, next);
+  },
+  async (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).send('User Not Authenticated');
+    }
+    next();
+  }, tokenService.generateJwt, tokenService.sendJwt);
 
 authRouter.post('/signup', async (req, res) => {
   const resObject = await utils.requestWrapper(authService.signUp, req.body,

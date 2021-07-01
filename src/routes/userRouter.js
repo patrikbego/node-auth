@@ -1,14 +1,17 @@
 const express = require('express');
-const passport = require('passport');
+const { body } = require('express-validator');
+const { check } = require('express-validator');
 const utils = require('../utils');
 const tokenService = require('../service/tokenService');
 const userService = require('../service/userService');
 
 const userRouter = express.Router();
 
-userRouter.get('/getUser', passport.authenticate('domain-token', { session: false }),
+userRouter.get('/getUser',
   async (req, res) => {
-    res.status(200);
+    const resObject = await utils.newRequestWrapper(userService.getUser, req, req.headers,
+      tokenService.isRequestTokenValid, true);
+    res.status(resObject.code).json(resObject.clientData);
   });
 
 userRouter.put('/updateUser', async (req, res) => {
