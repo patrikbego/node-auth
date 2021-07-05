@@ -34,7 +34,7 @@ const whitelist = ['http://localhost:3000', 'https://localhost',
   'http://localhost:9199', 'https://bego.tips', undefined, 'https://cukin.fun'];
 const dynamicCorsOptions = {
   origin(origin, callback) {
-    if (origin || whitelist.indexOf(origin) !== -1) { // TODO check on /getItems form nextjs (is it true that since nextjs and nodejs are runing on same machine this is undefined)
+    if (whitelist.indexOf(origin) !== -1) { // TODO check on /getItems form nextjs (is it true that since nextjs and nodejs are runing on same machine this is undefined)
       callback(null, true);
     } else {
       callback(new Error(`${origin} not allowed by CORSUS`));

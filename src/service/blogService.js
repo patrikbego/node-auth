@@ -58,6 +58,18 @@ const blogService = {
       return utils.responseObject(500, '', 'Could not retrieve data!');
     }
   },
+  async readByUserAndStatus(pool, data) {
+    try {
+      const userRes = (await objectRepository.run(pool,
+          `SELECT * FROM users WHERE user_name = '${data.username}'`))[0];
+      const blogs = await objectRepository.run(pool,
+          `SELECT * FROM blog WHERE status in (${data.statuses.map((num) => `'${num.toString()}'`).toString()}) and user_id = ${userRes.id} limit 100`);
+      return utils.responseObject(200, '', blogs);
+    } catch (err) {
+      console.error(`Blog creation failed: ${err}`);
+      return utils.responseObject(500, '', 'Could not retrieve data!');
+    }
+  },
   async readById(pool, queryObject) {
     try {
       let blog;

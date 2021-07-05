@@ -27,6 +27,20 @@ blogRouter.get('/getAllBlogs',
     res.status(resObject.code).json(resObject.clientData);
   });
 
+blogRouter.get('/getUserDraftBlogs/:username',
+  async (req, res) => {
+    const resObject = await utils.requestWrapper(blogService.readByUserAndStatus, { statuses: ['DRAFT'], username: req.params.username }, req.headers,
+      tokenService.isRequestTokenValid, true);
+    res.status(resObject.code).json(resObject.clientData);
+  });
+
+blogRouter.get('/getUserBlogs/:username',
+  async (req, res) => {
+    const resObject = await utils.requestWrapper(blogService.readByUserAndStatus, { statuses: ['PUBLISHED'], username: req.params.username }, req.headers,
+      tokenService.isRequestTokenValid, false);
+    res.status(resObject.code).json(resObject.clientData);
+  });
+
 blogRouter.put('/updateBlog', async (req, res) => {
   const resObject = await utils.requestWrapper(blogService.update, req.body, req.headers,
     tokenService.isRequestTokenValid, true);
