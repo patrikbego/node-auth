@@ -92,7 +92,7 @@ const tokenService = {
       user,
     }, 'my-secret',
     {
-      expiresIn: 60 * 5,
+      expiresIn: 60 * 30,
     });
   },
   generateJwt(req, res, next) {

@@ -31,7 +31,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.disable('x-powered-by');
 
 const whitelist = ['http://localhost:3000', 'https://localhost',
-  'http://localhost:9199', 'https://bego.tips', undefined, 'https://cukin.fun'];
+  'http://localhost:9199', undefined, 'https://octoplasm.com', 'http://192.168.64.109:3000'];
 const dynamicCorsOptions = {
   origin(origin, callback) {
     if (whitelist.indexOf(origin) !== -1) { // TODO check on /getItems form nextjs (is it true that since nextjs and nodejs are runing on same machine this is undefined)

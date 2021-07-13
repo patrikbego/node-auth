@@ -94,6 +94,29 @@ const utils = {
     return str;
   },
 
+  async authorizationCheck(
+    req, userId, isRequestTokenValid, userName,
+  ) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return utils.responseObject(400, '', { errors: errors.array() });
+      }
+      const token = await isRequestTokenValid(req.headers);
+      if (!token
+          || (userId && token.user.id !== userId)
+          || (userName && userName.toLowerCase() !== token.user.userName.toLowerCase())) {
+        return utils.responseObject(401, '', 'Unauthorized!');
+      }
+      return utils.responseObject(200, '', 'You can pass!');
+    } catch (err) {
+      const message = `Request processing failed: ${err}`;
+      console.error(message);
+      console.trace(err);
+      return utils.responseObject(400, '', message);
+    }
+  },
+
   async newRequestWrapper(
     func, req, headers, isRequestTokenValid, authRequired, pool,
   ) {

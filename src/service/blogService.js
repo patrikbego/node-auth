@@ -5,26 +5,28 @@ const blogService = {
   table: 'blog',
   async create(pool, postObject) {
     console.log(`Creating blog: ${postObject.title} ${postObject.lastName}`);
-
-    // data.status = 'draft';
-    if (postObject && postObject.title && postObject.userId) {
-      if (await objectRepository.exists(pool, { title: postObject.title },
-        blogService.table)) {
-        return utils.responseObject(400, '',
-          'Article with this title already exists!');
-      }
-      try {
-        if (await objectRepository.create(pool, postObject, blogService.table)) {
-          const searchRes = await blogService.read(pool, { query: postObject.title });
-          return searchRes;
-        }
-      } catch (err) {
-        console.log(`User creation failed: ${err}`);
-        return utils.responseObject(500, '', 'Could not create new data!');
-      }
+    if (postObject && !postObject.title) {
+      console.log(`Blog creation failed: ${postObject}`);
+      return utils.responseObject(400, '', 'Title in the first line is missing \n (e.g. "# Title")');
     }
-    console.log(`Blog creation failed: ${postObject}`);
-    return utils.responseObject(400, '', 'cu: Blog creation failed. cu');
+    if (postObject && !postObject.tags) {
+      console.log(`Blog creation failed: ${postObject}`);
+      return utils.responseObject(400, '', 'There should be at least one tag (e.g. "# New Post")');
+    }
+    if (await objectRepository.exists(pool, { title: postObject.title },
+      blogService.table)) {
+      return utils.responseObject(400, '',
+        'Article with this title already exists!');
+    }
+    try {
+      if (await objectRepository.create(pool, postObject, blogService.table)) {
+        const searchRes = await blogService.read(pool, { query: postObject.title });
+        return searchRes;
+      }
+    } catch (err) {
+      console.log(`User creation failed: ${err}`);
+      return utils.responseObject(500, '', 'Could not create new data!');
+    }
   },
   async read(pool, queryObject) {
     try {
@@ -61,9 +63,9 @@ const blogService = {
   async readByUserAndStatus(pool, data) {
     try {
       const userRes = (await objectRepository.run(pool,
-          `SELECT * FROM users WHERE user_name = '${data.username}'`))[0];
+        `SELECT * FROM users WHERE user_name = '${data.username}'`))[0];
       const blogs = await objectRepository.run(pool,
-          `SELECT * FROM blog WHERE status in (${data.statuses.map((num) => `'${num.toString()}'`).toString()}) and user_id = ${userRes.id} limit 100`);
+        `SELECT * FROM blog WHERE status in (${data.statuses.map((num) => `'${num.toString()}'`).toString()}) and user_id = ${userRes.id} limit 100`);
       return utils.responseObject(200, '', blogs);
     } catch (err) {
       console.error(`Blog creation failed: ${err}`);

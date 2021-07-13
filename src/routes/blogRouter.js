@@ -28,6 +28,18 @@ blogRouter.get('/getAllBlogs',
   });
 
 blogRouter.get('/getUserDraftBlogs/:username',
+  async (req, res, next) => {
+    if ((await utils.authorizationCheck(
+      req,
+      req.body.userId,
+      tokenService.isRequestTokenValid,
+      req.params.username,
+    )).code === 200) {
+      next();
+    } else {
+      res.status(401).json('Unauthorized!');
+    }
+  },
   async (req, res) => {
     const resObject = await utils.requestWrapper(blogService.readByUserAndStatus, { statuses: ['DRAFT'], username: req.params.username }, req.headers,
       tokenService.isRequestTokenValid, true);
@@ -41,11 +53,24 @@ blogRouter.get('/getUserBlogs/:username',
     res.status(resObject.code).json(resObject.clientData);
   });
 
-blogRouter.put('/updateBlog', async (req, res) => {
-  const resObject = await utils.requestWrapper(blogService.update, req.body, req.headers,
-    tokenService.isRequestTokenValid, true);
-  res.status(resObject.code).json(resObject.clientData);
-});
+blogRouter.put('/updateBlog',
+  async (req, res, next) => {
+    if ((await utils.authorizationCheck(
+      req,
+      req.body.userId,
+      tokenService.isRequestTokenValid,
+      req.params.username,
+    )).code === 200) {
+      next();
+    } else {
+      res.status(401).json('Unauthorized!');
+    }
+  },
+  async (req, res) => {
+    const resObject = await utils.requestWrapper(blogService.update, req.body, req.headers,
+      tokenService.isRequestTokenValid, true);
+    res.status(resObject.code).json(resObject.clientData);
+  });
 
 blogRouter.post('/createBlog', async (req, res) => {
   const resObject = await utils.requestWrapper(blogService.create, req.body, req.headers,
@@ -53,8 +78,20 @@ blogRouter.post('/createBlog', async (req, res) => {
   res.status(resObject.code).json(resObject.clientData);
 });
 
-blogRouter.delete('/deleteBlog', async (req, res) => {
-  const resObject = await utils.requestWrapper(blogService.delete, req.body, req.headers,
+blogRouter.delete('/deleteBlog', async (req, res, next) => {
+  if (await utils.authorizationCheck(
+    req,
+    req.body.userId,
+    tokenService.isRequestTokenValid,
+  )) {
+    next();
+  } else {
+    res.status(401).json('Unauthorized!');
+  }
+},
+async (req, res) => {
+  const resObject = await utils.requestWrapper(blogService.delete, req.body,
+    req.headers,
     tokenService.isRequestTokenValid, true);
   res.status(resObject.code).json(resObject.clientData);
 });
