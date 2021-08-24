@@ -67,7 +67,7 @@ const tokenService = {
   async isRequestTokenValid(headers) {
     const token = utils.extractTokenFromHeaders(headers);
     return token && (await tokenService.isJwtHeaderValid(token))
-      ? tokenService.getJwt(token) : null;
+      ? tokenService.decodeJwt(token) : null;
   },
   async deleteToken(pool, data) {
     if (data.email
@@ -83,7 +83,7 @@ const tokenService = {
     return token.email === email && token.expires > Date.now();
   },
   async isJwtHeaderValid(token) {
-    const decoded = tokenService.getJwt(token);
+    const decoded = tokenService.decodeJwt(token);
     return decoded.id && decoded.exp > Date.now() / 1000;
   },
   createJwt(user) {
@@ -109,12 +109,62 @@ const tokenService = {
     if (req.user) {
       token = tokenService.createJwt(req.user);
     }
+    // TODO for some reason the cookie does not come through over https - it works on localhost
+    // const dt = new Date();
+    // dt.setTime(dt.getTime() + (1 * 60 * 60 * 1000));
+    //
+    // res.setHeader('Access-Control-Allow-Credentials', true);
+    // res.setHeader('Access-Control-Allow-Origin', 'https://bego.tips');
+    // res.setHeader('Access-Control-Allow-Headers', 'true');
+    // res.setHeader('Set-Cookie', `__st=${res.token}; Max-Age=1800; HttpOnly; SameSite=None; Secure`); // TODO check security - refer to rest-api.js (initial commit)
+    // res.setHeader('Set-Cookie', `devstr=${res.token}; Max-Age=30000; Domain=bego.tips; SameSite=None; Secure`); // TODO check security - refer to rest-api.js (initial commit)
+    // res.setHeader('Set-Cookie', `devst9=${res.token}; Max-Age=30000; Path=/; SameSite=None; Secure`); // TODO check security - refer to rest-api.js (initial commit)
+    // res.setHeader('Set-Cookie', `devst1=${res.token}; Max-Age=30000; Path=/; SameSite=None;`); // TODO check security - refer to rest-api.js (initial commit)
+    // res.setHeader('Set-Cookie', `devst2=${res.token}; Max-Age=30000; Path=/;`); // TODO check security - refer to rest-api.js (initial commit)
+    // res.setHeader('Set-Cookie', `devst3=${res.token}; Max-Age=30000;`); // TODO check security - refer to rest-api.js (initial commit)
+    // res.setHeader('Set-Cookie', `devst4=${res.token};`); // TODO check security - refer to rest-api.js (initial commit)
+    // res.setHeader('Set-Cookie', `devst5=${res.token}; Domain=bego.tips`); // TODO check security - refer to rest-api.js (initial commit)
+    // res.setHeader('Set-Cookie', `devst5=${res.token}; Domain=bego.tips`); // TODO check security - refer to rest-api.js (initial commit)
+    // res.set('WWW-Authenticate', 'x');
+    //
+    // try {
+    //   res.cookie('myCookie1s', res.token, { expires: new Date(Date.now() + 1000 * 60 * 3600), httpOnly: true, secure: true});
+    //   res.cookie('myCookie2s', 234, { expires: new Date(Date.now() + 1000 * 60 * 3600), secure: true });
+    //   res.cookie('cookieNames', 'cookieValue', { SameSite: 'none', secure: true, httpOnly: true });
+    //   res.cookie('myCookie3s', 234, {
+    //     expires: new Date(Date.now() + 1000 * 60 * 3600), domain: 'bego.tips', path: '/', SameSite: 'None', secure: true, httpOnly: true
+    //   });
+    //   res.cookie('myCookie4s', res.token, {
+    //     expires: new Date(Date.now() + 1000 * 60 * 3600), domain: '.bego.tips', SameSite: 'None', secure: true,  httpOnly: true,
+    //   });
+    //   res.cookie('myCookie5s', res.token, { expires: new Date(Date.now() + 1000 * 60 * 3600), secure: true,  httpOnly: true});
+    //   res.cookie('bfbfbfs', 'value', { maxAge: 360000, secure: true });
+    //
+    //   res.cookie('myCookie1', res.token, { expires: new Date(Date.now() + 1000 * 60 * 3600), httpOnly: true});
+    //   res.cookie('myCookie2', 234, { expires: new Date(Date.now() + 1000 * 60 * 3600)});
+    //   res.cookie('cookieName', 'cookieValue', { SameSite: 'none'});
+    //   res.cookie('myCookie3', 234, {
+    //     expires: new Date(Date.now() + 1000 * 60 * 3600), domain: 'bego.tips', path: '/', SameSite: 'None',
+    //   });
+    //   res.cookie('myCookie4', res.token, {
+    //     expires: new Date(Date.now() + 1000 * 60 * 3600), domain: '.bego.tips', SameSite: 'None',
+    //   });
+    //   res.cookie('myCookie5', res.token, { expires: new Date(Date.now() + 1000 * 60 * 3600) });
+    //   res.cookie('bfbfbf', 'value', { maxAge: 360000 });
+    //   // res.setHeader('Authorization', tokenService.generateJwtToken(req, res, next)); // TODO consider using as secret users password
+    //   return res.status(200).cookie('name', 'express').send({ user: req.user, token });
+    // } catch (e) {
+    //   console.error('Could not set the cookies: ', e);
+    // }
+    // return res.status(400);
+
     res.setHeader('Set-Cookie', `__st=${token}; maxAge=30000; HttpOnly=true; SameSite=None; Secure`); // TODO check security - refer to rest-api.js (initial commit)
     res.setHeader('Set-Cookie', `devst=${token}; maxAge=30000; Path=/; SameSite=None; Secure`); // TODO check security - refer to rest-api.js (initial commit)
     // res.setHeader('Authorization', tokenService.generateJwtToken(req, res, next)); // TODO consider using as secret users password
     return res.status(200).send({ user: req.user, token });
+    // END TODO
   },
-  getJwt(token) {
+  decodeJwt(token) {
     const decoded = jwt.verify(token, 'my-secret');
     console.log(decoded); // bar
     return decoded;

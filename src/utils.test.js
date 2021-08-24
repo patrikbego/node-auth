@@ -1,7 +1,42 @@
 const assert = require('assert');
 const unitTestPoc = require('./utils');
 
-describe('tokenService test', () => {
+describe('utils test', () => {
+  test('extractTokenFromHeaders - header not present', async () => {
+    let token = unitTestPoc.extractTokenFromHeaders(null);
+    assert.strictEqual(token, undefined);
+    token = unitTestPoc.extractTokenFromHeaders({});
+    assert.strictEqual(token, undefined);
+    token = unitTestPoc.extractTokenFromHeaders(undefined);
+    assert.strictEqual(token, undefined);
+    token = unitTestPoc.extractTokenFromHeaders('');
+    assert.strictEqual(token, undefined);
+  });
+
+  test('extractTokenFromHeaders - token not present', async () => {
+    const headers = new Headers();
+    const token = unitTestPoc.extractTokenFromHeaders(headers);
+    assert.strictEqual(token, undefined);
+
+    const headers1 = new Headers();
+    headers1.append('Content-Type', 'text/xml');
+    headers1.append('xxx', '123');
+    headers1.append('Accept', 'application/json');
+    headers1.set('Set-Cookie', 'qwerty=219ffwef9w0f; Domain=somecompany.co.uk');
+    // headers1.append('Set-Cookie', 'qwerty=219ffwef9w0f; Domain=somecompany.co.uk');
+    headers1.append('cookie', 'qwerty=219ffwef9w0f; Domain=somecompany.co.uk');
+    const token1 = unitTestPoc.extractTokenFromHeaders(headers1);
+    assert.strictEqual(token1, undefined);
+  });
+
+  test('extractTokenFromHeaders - token present', async () => {
+    const headers = new Headers();
+    headers.append('cookie', 'devst=123;');
+    const token = unitTestPoc.extractTokenFromHeaders(headers);
+    assert.strictEqual(token, 123);
+  });
+
+  // this is just poc - can be removed
   test('lib.simpleSum should return a number', async () => {
     const sum = unitTestPoc.simpleSum(1, 1);
     assert.strictEqual(typeof (sum), 'number');

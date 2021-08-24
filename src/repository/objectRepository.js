@@ -48,7 +48,6 @@ const objectRepository = {
       console.log(`running query ${query.text}`, query.whereValues, query.orderValues);
       const res = await client.query(query.text, query.whereValues);
       for (const row of res.rows) {
-        console.log(row);
         result.push(objectParamMapper.remapFromSqlObject(row));
       }
       return result;
@@ -70,10 +69,8 @@ const objectRepository = {
     const result = [];
     try {
       const res = await client.query(query, paramsArray);
-      console.log(res);
       console.log(`${query} run successfully`);
       for (const row of res.rows) {
-        console.log(row);
         result.push(objectParamMapper.remapFromSqlObject(row));
       }
       return result;

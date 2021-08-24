@@ -29,6 +29,7 @@ blogRouter.get('/getAllBlogs',
 
 blogRouter.get('/getUserDraftBlogs/:username',
   async (req, res, next) => {
+    console.log('--- getUserDraftBlogs ---', req.params.id);
     if ((await utils.authorizationCheck(
       req,
       req.body.userId,

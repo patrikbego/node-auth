@@ -103,12 +103,12 @@ const utils = {
         return utils.responseObject(400, '', { errors: errors.array() });
       }
       const token = await isRequestTokenValid(req.headers);
-      if (!token
-          || (userId && token.user.id !== userId)
-          || (userName && userName.toLowerCase() !== token.user.userName.toLowerCase())) {
-        return utils.responseObject(401, '', 'Unauthorized!');
+      if (token
+          && ((userId && token.user.id === userId)
+              || (userName && userName.toLowerCase() === token.user.userName.toLowerCase()))) {
+        return utils.responseObject(200, '', 'You can pass!');
       }
-      return utils.responseObject(200, '', 'You can pass!');
+      return utils.responseObject(401, '', 'Unauthorized!');
     } catch (err) {
       const message = `Request processing failed: ${err}`;
       console.error(message);
@@ -174,18 +174,18 @@ const utils = {
   },
 
   extractTokenFromHeaders(headers) {
-    let token = '';
-
-    const rc = headers.cookie;
-    rc && rc.split(';').forEach((cookie) => {
-      const parts = cookie.split('=');
-      console.log(
-        `cookie: ${parts[0]}=${parts[1]}`,
-      );
-      if (parts[0].trim() === '__st' || parts[0].trim() === 'devst') {
-        token = parts[1];
-      }
-    });
+    let token;
+    if (headers && headers.cookie) {
+      headers.cookie.split(';').forEach((cookie) => {
+        const parts = cookie.split('=');
+        console.log(
+          `cookie: ${parts[0]}=${parts[1]}`,
+        );
+        if (parts[0].trim() === '__st' || parts[0].trim() === 'devst') {
+          token = parts.length === 2 ? parts[1] : undefined;
+        }
+      });
+    }
     return token;
   },
 

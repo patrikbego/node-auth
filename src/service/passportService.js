@@ -33,7 +33,7 @@ module.exports = function () {
   // opts.issuer = 'accounts.examplesoft.com';
   // opts.audience = 'yoursite.net';
   passport.use('jwt', new JwtStrategy(opts, (async (jwt, done) => {
-    const user = tokenService.getJwt(jwt);
+    const user = tokenService.decodeJwt(jwt);
     if (user) done(null, user && user.length > 0 ? user[0] : null);
     else done(null, { message: 'Wrong Password' });
   })));

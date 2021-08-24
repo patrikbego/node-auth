@@ -30,7 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.disable('x-powered-by');
 
-const whitelist = ['http://localhost:3000', 'https://localhost',
+const whitelist = ['http://localhost:3000', 'https://localhost', 'https://bego.tips',
   'http://localhost:9199', undefined, 'https://octoplasm.com', 'http://192.168.64.109:3000'];
 const dynamicCorsOptions = {
   origin(origin, callback) {
@@ -49,12 +49,14 @@ const dynamicCorsOptions = {
 // TODO consider adding functionality like "Do you trust this browser"
 //  -> based on response set cookie,jwt expiration time to forever
 //  (else log out user after an hour)"
+/**
+ * This is refresh token. Exp date is being refreshed every x minutes for every request
+ */
 app.use((req, res, next) => {
   const token = utils.extractTokenFromHeaders(req.headers);
-  // TODO implement cookies as refresh tokens
   if (token) {
     try {
-      const decoded = tokenService.getJwt(token); // performs check if expired
+      const decoded = tokenService.decodeJwt(token); // performs check if expired
       const nt = tokenService.createJwt(decoded.user);
       // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie // max age set to 7 days (604800 s)
       res.setHeader('Set-Cookie', `__st=${nt}; maxAge=604800; httpOnly: true; SameSite=None; Secure`); // TODO check security - refer to rest-api.js (initial commit)
