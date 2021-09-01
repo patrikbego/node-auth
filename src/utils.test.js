@@ -22,18 +22,20 @@ describe('utils test', () => {
     headers1.append('Content-Type', 'text/xml');
     headers1.append('xxx', '123');
     headers1.append('Accept', 'application/json');
-    headers1.set('Set-Cookie', 'qwerty=219ffwef9w0f; Domain=somecompany.co.uk');
+    headers1.set('Set-Cookie', 'qwerty=219ffwef9w0f; Domain=somecompany.com');
     // headers1.append('Set-Cookie', 'qwerty=219ffwef9w0f; Domain=somecompany.co.uk');
-    headers1.append('cookie', 'qwerty=219ffwef9w0f; Domain=somecompany.co.uk');
+    headers1.append('cookie', 'qwerty=219ffwef9w0f; Domain=somecompany.com');
     const token1 = unitTestPoc.extractTokenFromHeaders(headers1);
     assert.strictEqual(token1, undefined);
   });
 
   test('extractTokenFromHeaders - token present', async () => {
-    const headers = new Headers();
-    headers.append('cookie', 'devst=123;');
+    const headers = {
+      cookie: 'devst=219ffwef9w0f; Domain=somecompany.com',
+    };
+
     const token = unitTestPoc.extractTokenFromHeaders(headers);
-    assert.strictEqual(token, 123);
+    assert.strictEqual(token, '219ffwef9w0f');
   });
 
   // this is just poc - can be removed
