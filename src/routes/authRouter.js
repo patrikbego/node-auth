@@ -10,6 +10,8 @@ const authRouter = express.Router();
 
 require('../service/passportService')();
 
+const errorRouteMessage = { message: 'This user has been registered with a different route.' };
+
 authRouter.route('/fb').post((req, res, next) => {
   passport.authenticate('facebook-token',
     { session: false, scope: ['email'] }, (err, user, info) => {
@@ -22,7 +24,7 @@ authRouter.route('/fb').post((req, res, next) => {
 },
 async (req, res, next) => {
   if (!req.user) {
-    return res.status(401).send('User Not Authenticated');
+    return res.status(401).send(errorRouteMessage);
   }
   next();
 }, tokenService.generateJwt, tokenService.sendJwt);
@@ -39,7 +41,7 @@ authRouter.route('/googl').post((req, res, next) => {
 },
 async (req, res, next) => {
   if (!req.user) {
-    return res.status(401).send('User Not Authenticated');
+    return res.status(401).send(errorRouteMessage);
   }
   next();
 }, tokenService.generateJwt, tokenService.sendJwt);
@@ -58,7 +60,7 @@ authRouter.post('/signin',
   },
   async (req, res, next) => {
     if (!req.user) {
-      return res.status(401).send('User Not Authenticated');
+      return res.status(401).send(errorRouteMessage);
     }
     next();
   }, tokenService.generateJwt, tokenService.sendJwt);

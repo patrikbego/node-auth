@@ -62,7 +62,7 @@ app.use((req, res, next) => {
       res.setHeader('Set-Cookie', `__st=${nt}; maxAge=604800; httpOnly: true; SameSite=None; Secure`); // TODO check security - refer to rest-api.js (initial commit)
       res.setHeader('Set-Cookie', `devst=${nt}; maxAge=604800; Path=/; SameSite=None; Secure`);
     } catch (e) {
-      console.log(`Token expired ${token}`);
+      console.log(`Token expired ${token}`, e);
     }
   }
   next();

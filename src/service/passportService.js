@@ -57,11 +57,13 @@ module.exports = function () {
           }
 
           if (user.clientData.password !== utils.hash(password)) {
-            return done(null, false, { message: 'Email or Password is not correct' });
+            return done(null, false,
+              { message: 'Email or Password is not correct' });
           }
 
           user.clientData.password = '';
-          return done(null, user.clientData, { message: 'Logged in Successfully' });
+          return done(null, user.clientData,
+            { message: 'Logged in Successfully' });
         } catch (error) {
           return done(error);
         }
@@ -72,14 +74,22 @@ module.exports = function () {
   passport.use('facebook-token', new FacebookTokenStrategy({
     clientID: config.facebook.clientID,
     clientSecret: config.facebook.clientSecret,
-    profileFields: ['id', 'email', 'link', 'locale', 'name', 'timezone', 'updated_time', 'verified', 'displayName'],
+    profileFields: [
+      'id',
+      'email',
+      'link',
+      'locale',
+      'name',
+      'timezone',
+      'updated_time',
+      'verified',
+      'displayName'],
   },
   (async (accessToken, refreshToken, profile, done) => {
     console.log(profile);
-    const user = await userService.createOrUpdateUser(null, profile);
-
-    done(null, user && user.length > 0 ? user[0] : null);
-  })));
+    await userService.signInWithProvider(profile, done, 'facebook');
+  }
+  )));
 
   passport.use('google-token', new GoogleTokenStrategy({
     clientID: config.google.clientID,
@@ -88,8 +98,7 @@ module.exports = function () {
   },
   (async (accessToken, refreshToken, profile, done) => {
     console.log(profile);
-    const user = await userService.createOrUpdateUser(null, profile);
-
-    done(null, user && user.length > 0 ? user[0] : null);
-  })));
+    await userService.signInWithProvider(profile, done, 'google');
+  }
+  )));
 };

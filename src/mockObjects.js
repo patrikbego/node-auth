@@ -51,6 +51,28 @@ const testObject = {
     created_date: new Date(),
     updated_date: new Date(),
   },
+  profile: {
+    provider: 'facebook',
+    id: '10219365682069042',
+    displayName: 'Patrik test',
+    name: { familyName: 'test', givenName: 'Patrik', middleName: '' },
+    gender: '',
+    emails: [{ value: 'patrik.test@test.com' }],
+    photos: [
+      {
+        value: 'https://graph.facebook.com/v2.6/102193636820369042/picture?type=large',
+      },
+    ],
+    _raw: '{"id":"1021936368239042","email":"patrik.test\\u0040gmail.com","last_name":"test","first_name":"Patrik","name":"Patrik test"}',
+    _json: {
+      id: '1021936568249042',
+      email: 'patrik.test@gmail.com',
+      last_name: 'test',
+      first_name: 'Patrik',
+      name: 'Patrik test',
+    },
+  },
+
 };
 
 module.exports = testObject;

@@ -20,7 +20,7 @@ const mailgunService = {
       from: `postmaster@${domain}`,
       to: 'patrik.delo@gmail.com',
       subject: 'Hello Patrik Delo',
-      text: 'Please confirm email by clicking on link: ',
+      text: 'Please confirm email by clicking on the link: ',
     },
   },
   async sendEmail(body) {

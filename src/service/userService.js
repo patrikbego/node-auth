@@ -42,6 +42,8 @@ const userService = {
       lastName: userData.name.familyName,
       email: userData.emails[0].value,
       providerRaw: userData._raw,
+      createdDate: new Date(),
+      lastLogin: new Date(),
     };
     console.log(`Creating user: ${userData}`);
     newUser.status = 'NEW';
@@ -53,7 +55,7 @@ const userService = {
     }
     try {
       if (await objectRepository.create(pool, newUser, userService.table)) {
-        return objectRepository.select(pool,
+        return await objectRepository.select(pool,
           { provider_id: newUser.providerId }, userService.table);
       }
     } catch (err) {
@@ -121,13 +123,12 @@ const userService = {
     }
   },
   async getAllUsers(pool, createdAfterNrOfDays) {
-    const result = await objectRepository.select(pool, undefined, userService.table);
-    const userList = result.clientData;
+    const userList = await objectRepository.select(pool, undefined, userService.table);
     const betweenList = [];
-    if (createdAfterNrOfDays) {
+    if (createdAfterNrOfDays && userList) {
       for (let i = 0; i < userList.length; i += 1) {
         const user = userList[i];
-        if (user.createdAt > Date.now()
+        if (user.createdDate > Date.now()
             - (1000 * 60 * 60 * 24 * createdAfterNrOfDays)) {
           betweenList.push(user);
         }
@@ -197,6 +198,30 @@ const userService = {
       updatedDate,
       lastLogin,
     };
+  },
+  async signInWithProvider(profile, done, provider) {
+    try {
+      if (profile && profile.emails && profile.emails.length > 0) {
+        const userResArray = [];
+        for (const email of profile.emails) {
+          userResArray.push((await userService.getUser(null, { email: email.value }, true)));
+        }
+
+        for (const userRes of userResArray) {
+          if (userRes && userRes.clientData && userRes.clientData.email
+                && userRes.clientData.provider.toLowerCase() !== provider) {
+            // TODO send email that somebody try to login with this user
+            return done(null, null,
+              { message: 'This user has signed in by different method' });
+          }
+        }
+        const user = await userService.createOrUpdateUser(null, profile);
+
+        return done(null, user && user.length > 0 ? user[0] : null);
+      }
+    } catch (error) {
+      return done(error);
+    }
   },
 };
 

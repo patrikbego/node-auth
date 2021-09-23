@@ -1,6 +1,8 @@
 const to = require('../mockObjects');
 const userService = require('./userService');
 const db = require('../repository/db-migrate');
+const mailgunService = require('./mailgunService');
+const mockObjects = require('../mockObjects');
 
 describe('userService test', () => {
   let pool;
@@ -40,5 +42,27 @@ describe('userService test', () => {
       const updatedDelUser = await userService.getUser(pool, res.clientData);
       expect(updatedDelUser.clientData.status).toBe('DELETED');
     }
+  });
+
+  test('signInWithProvider test', async () => {
+    const proUserFail = await userService.signInWithProvider(null, () => {
+    }, null);
+    const allUsersFail = await userService.getAllUsers(null, 1);
+    expect(allUsersFail.clientData.length).toBe(0);
+
+    const proUserSuccess = await userService.signInWithProvider(mockObjects.profile, () => {
+    }, 'facebook');
+    const allUsersSuccess = await userService.getAllUsers(null, 1);
+    expect(allUsersSuccess.clientData.length).toBe(1);
+
+    const proUserExist = await userService.signInWithProvider(mockObjects.profile, () => {
+    }, 'facebook');
+    const allUsersExist = await userService.getAllUsers(null, 1);
+    expect(allUsersExist.clientData.length).toBe(1);
+
+    const proUserSameProvider = await userService.signInWithProvider(mockObjects.profile, () => {
+    }, 'google');
+    const allUsersSameProvider = await userService.getAllUsers(null, 1);
+    expect(allUsersSameProvider.clientData.length).toBe(1);
   });
 });
