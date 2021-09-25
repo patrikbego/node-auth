@@ -40,12 +40,12 @@ describe('PasportService test', () => {
         req.user = user;
         console.log(info);
       });
-    expect(req.user).toBe(true);
+    expect(req.user.email).toBe('atest@atest.com');
   });
 
   test('facebook-token user exist test', async () => {
     const req = {};
-    req.user = user;
+    req.user = mock.user;
     passport.authenticate('facebook-token',
       { session: false, scope: ['email'] }, (err, user, info) => {
         req.user = user;

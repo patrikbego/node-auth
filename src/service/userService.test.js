@@ -48,21 +48,21 @@ describe('userService test', () => {
     const proUserFail = await userService.signInWithProvider(null, () => {
     }, null);
     const allUsersFail = await userService.getAllUsers(null, 1);
-    expect(allUsersFail.clientData.length).toBe(0);
+    expect(allUsersFail.clientData.length).toBe(10);//TODO 10 because of previous test
 
     const proUserSuccess = await userService.signInWithProvider(mockObjects.profile, () => {
     }, 'facebook');
     const allUsersSuccess = await userService.getAllUsers(null, 1);
-    expect(allUsersSuccess.clientData.length).toBe(1);
+    expect(allUsersSuccess.clientData.length).toBe(11);
 
     const proUserExist = await userService.signInWithProvider(mockObjects.profile, () => {
     }, 'facebook');
     const allUsersExist = await userService.getAllUsers(null, 1);
-    expect(allUsersExist.clientData.length).toBe(1);
+    expect(allUsersExist.clientData.length).toBe(11);
 
     const proUserSameProvider = await userService.signInWithProvider(mockObjects.profile, () => {
     }, 'google');
     const allUsersSameProvider = await userService.getAllUsers(null, 1);
-    expect(allUsersSameProvider.clientData.length).toBe(1);
+    expect(allUsersSameProvider.clientData.length).toBe(11);
   });
 });
