@@ -96,7 +96,7 @@ const userService = {
         return utils.responseObject(500, '', 'Could not retrieve data!');
       }
     }
-    return utils.responseObject(500, '', 'user not found');
+    return utils.responseObject(500, '', 'User does not exist or password is not correct ...');
   },
   async updateUser(pool, userData) {
     console.log(`Updating user: ${userData.firstName} ${userData.lastName}`);
@@ -211,8 +211,8 @@ const userService = {
           if (userRes && userRes.clientData && userRes.clientData.email
                 && userRes.clientData.provider.toLowerCase() !== provider) {
             // TODO send email that somebody try to login with this user
-            return done(null, null,
-              { message: 'This user has signed in by different method' });
+            return done('This user has been registered via a different route.', null,
+              { message: 'This user has been registered via a different route.' });
           }
         }
         const user = await userService.createOrUpdateUser(null, profile);

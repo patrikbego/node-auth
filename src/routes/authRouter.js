@@ -10,7 +10,7 @@ const authRouter = express.Router();
 
 require('../service/passportService')();
 
-const errorRouteMessage = { message: 'This user has been registered with a different route.' };
+const errorRouteMessage = { message: 'User does not exist or password is not correct!' };
 
 authRouter.route('/fb').post((req, res, next) => {
   passport.authenticate('facebook-token',
@@ -24,7 +24,7 @@ authRouter.route('/fb').post((req, res, next) => {
 },
 async (req, res, next) => {
   if (!req.user) {
-    return res.status(401).send(errorRouteMessage);
+    return res.status(401).send(req.message ? { message: req.message } : errorRouteMessage);
   }
   next();
 }, tokenService.generateJwt, tokenService.sendJwt);
@@ -41,7 +41,7 @@ authRouter.route('/googl').post((req, res, next) => {
 },
 async (req, res, next) => {
   if (!req.user) {
-    return res.status(401).send(errorRouteMessage);
+    return res.status(401).send(req.message ? { message: req.message } : errorRouteMessage);
   }
   next();
 }, tokenService.generateJwt, tokenService.sendJwt);
@@ -55,12 +55,13 @@ authRouter.post('/signin',
         console.info('domain passport info', info);
         console.error('domain passport error', err);
         req.user = user;
+        req.message = err;
         next();
       })(req, res, next);
   },
   async (req, res, next) => {
     if (!req.user) {
-      return res.status(401).send(errorRouteMessage);
+      return res.status(401).send(req.message ? { message: req.message } : errorRouteMessage);
     }
     next();
   }, tokenService.generateJwt, tokenService.sendJwt);

@@ -35,7 +35,7 @@ module.exports = function () {
   passport.use('jwt', new JwtStrategy(opts, (async (jwt, done) => {
     const user = tokenService.decodeJwt(jwt);
     if (user) done(null, user && user.length > 0 ? user[0] : null);
-    else done(null, { message: 'Wrong Password' });
+    else done(null, null, { message: 'Wrong Password' });
   })));
 
   passport.use(
@@ -53,11 +53,11 @@ module.exports = function () {
           const user = await userService.getUser(null, { email }, true);
 
           if (!user || !user.clientData) {
-            return done(null, false, { message: 'User not found' });
+            return done('User does not exist or password is not correct.', false, { message: 'User not found' });
           }
 
           if (user.clientData.password !== utils.hash(password)) {
-            return done(null, false,
+            return done('Email or Password is not correct', false,
               { message: 'Email or Password is not correct' });
           }
 
