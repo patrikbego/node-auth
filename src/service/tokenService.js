@@ -3,6 +3,8 @@ const utils = require('../utils');
 const objectRepository = require('../repository/objectRepository');
 const userService = require('./userService');
 
+require('log-timestamp');
+
 const tokenService = {
   table: 'tokens',
   async createToken(pool, userData) {

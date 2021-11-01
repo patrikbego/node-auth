@@ -6,6 +6,8 @@ const authService = require('../service/authService');
 const utils = require('../utils');
 const tokenService = require('../service/tokenService');
 
+require('log-timestamp');
+
 const authRouter = express.Router();
 
 require('../service/passportService')();

@@ -1,6 +1,8 @@
 const knex = require('knex');
 const config = require('./knexfile');
 
+require('log-timestamp');
+
 console.log('From db-migrate', process.env.NODE_ENV);
 if (process.env.NODE_ENV.toLowerCase() === 'test') {
   module.exports = knex(config.test);

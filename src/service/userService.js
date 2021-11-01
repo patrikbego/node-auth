@@ -1,6 +1,8 @@
 const utils = require('../utils');
 const objectRepository = require('../repository/objectRepository');
 
+require('log-timestamp');
+
 const userService = {
   table: 'users',
   async createUser(pool, userData) {

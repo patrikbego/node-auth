@@ -3,6 +3,8 @@ const { Pool } = require('pg');
 const objectParamMapper = require('./utils/objectParamMapper');
 const config = require('../../config.local');
 
+require('log-timestamp');
+
 const objectRepository = {
   getPool(pool) {
     if (pool) {

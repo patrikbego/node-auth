@@ -131,6 +131,9 @@ environments.<env> = {
 `docker build -t auth-node .`
 `docker run --name auth-node-api -d -p 8888:3005 auth-node`
 
+# Run whole environment e2e locally (nginx, postgres, redis, auth-node...)
+Refer to automata/README.md.
+
 ### References
 (Express)[https://expressjs.com/en/guide/routing.html]  
 (Jest)[https://jestjs.io/docs/en/getting-started.html]   

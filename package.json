@@ -28,6 +28,7 @@
     "http-errors": "~1.6.3",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.21.17",
+    "log-timestamp": "^0.3.0",
     "morgan": "~1.9.1",
     "passport": "^0.4.1",
     "passport-facebook-token": "^4.0.0",

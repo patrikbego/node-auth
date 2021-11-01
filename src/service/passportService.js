@@ -9,6 +9,8 @@ const userService = require('./userService');
 const utils = require('../utils');
 const tokenService = require('./tokenService');
 
+require('log-timestamp');
+
 passport.serializeUser((user, done) => {
   console.log(user, 'from passport');
   done(null, user);

@@ -4,6 +4,8 @@ const https = require('https');
 const { validationResult } = require('express-validator');
 const config = require('../config.local');
 
+require('log-timestamp');
+
 // Container for all the helpers
 const utils = {
   // Parse a JSON string to an object in all cases, without throwing

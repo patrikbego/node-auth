@@ -4,6 +4,8 @@ const userService = require('./userService');
 const mailgunService = require('./mailgunService');
 const objectRepository = require('../repository/objectRepository');
 
+require('log-timestamp');
+
 // TODO add transactional behaviour
 const authService = {
   table: 'auth',

@@ -1,6 +1,8 @@
 const objectRepository = require('../repository/objectRepository');
 const utils = require('../utils');
 
+require('log-timestamp');
+
 const blogService = {
   table: 'blog',
   async create(pool, postObject) {
@@ -46,7 +48,7 @@ const blogService = {
       }
       return utils.responseObject(200, '', blogs);
     } catch (err) {
-      console.log(`Blog creation failed: ${err}`);
+      console.log(`Blog retrieve failed: ${err}`);
       return utils.responseObject(500, '', 'Could not retrieve data!');
     }
   },

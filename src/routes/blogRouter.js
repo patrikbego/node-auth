@@ -4,6 +4,8 @@ const utils = require('../utils');
 const blogService = require('../service/blogService');
 const tokenService = require('../service/tokenService');
 
+require('log-timestamp');
+
 const blogRouter = express.Router();
 
 blogRouter.get('/getBlog/:id',
