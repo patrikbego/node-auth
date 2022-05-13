@@ -74,7 +74,7 @@ printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltNam
 ```
 Update the config.local with private key and certificate
 ### Configure config.local.js
-Credentials needs to be udpated: 
+Credentials need to be updated: 
 ```javascript
 environments.<env> = {
   httpPort: xxx,
