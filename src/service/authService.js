@@ -1,9 +1,11 @@
+const jwt = require('jsonwebtoken');
 const utils = require('../utils');
 const tokenService = require('./tokenService');
 const userService = require('./userService');
-const mailgunService = require('./mailgunService');
-const objectRepository = require('../repository/objectRepository');
+const mailService = require('./mailService');
+const config = require('../../config.local');
 
+const objectRepository = require('../repository/objectRepository');
 require('log-timestamp');
 
 // TODO add transactional behaviour
@@ -52,8 +54,16 @@ const authService = {
     const userRes = await userService.createUser(pool, userData);
     if (userRes.code !== 200) return userRes;
     const tokenRes = await tokenService.createToken(pool, userData);
-    const confirmationToken = `${tokenRes.clientData.token}&email=${userData.email}&phone=${userData.phone}`;
-    const link = `http://localhost:3000/confirmEmail?token=${confirmationToken}`; // TODO consider hashing the link
+    const confirmationToken = {
+      tokenId: tokenRes.clientData.id,
+      email: userData.email,
+      phone: userData.phone,
+    }; // token expiration 15 mins
+    const signedMailConfirmationToken = jwt.sign({ confirmationToken }, config.hashingSecret,
+      {
+        expiresIn: 60 * 15,
+      });
+    const link = `${config.host}/api/v1/auth/confirmEmail?token=${signedMailConfirmationToken}`;
 
     const authObject = {
       tokenId: tokenRes.clientData.id,
@@ -64,34 +74,49 @@ const authService = {
       status: 'NEW',
     };
 
-    await authService.createAuth(pool, authObject);
+    const authData = (await authService.createAuth(pool, authObject)).serverData;
 
     // send confirmation email
-    mailgunService.template.confirmEmail.text += link;
     if (!test) {
-      const mail = await mailgunService.sendEmail(
-        mailgunService.template.confirmEmail,
-      );
-      console.log(mail);
+      const templateVars = {
+        emailAddress: userData.email,
+        resetLink: `${link}&tid=${authObject.tokenId}`,
+      };
+      const generatedData = mailService.templateFiller(templateVars, 'confirmEmailT');
+      await mailService.sendEmail(generatedData, {
+        to: userData.email,
+        from: 'support@octoplasm.com',
+        subject: 'Please confirm your email address',
+      });
+      console.debug(generatedData);
     }
 
     return utils.responseObject(200, link, 'Please confirm email');
   },
   async confirmEmail(pool, data) {
-    const tokenRes = await tokenService.getToken(pool, data);
-    // TODO compare to the saved link and user email (this can be done also against user/phone/token) or add a counter
-    if (tokenRes.code !== 200) {
-      return utils.responseObject(400, '', 'Email confirmation failed');
+    const { token } = data;
+    const decodedToken = tokenService.decodeJwt(token);
+    const authData = (await objectRepository.select(
+      pool, { tokenId: decodedToken.confirmationToken.tokenId }, authService.table,
+    ))[0];
+    if (!authData.confirmationLink || !authData.confirmationLink.includes(data.token)) {
+      return utils.responseObject(400, '', {
+        message: 'Email confirmation failed',
+        redirectUrl: `${config.host}/login`,
+      });
     }
     // send confirmation email
-    const userRes = await userService.getUser(pool,
-      { email: tokenRes.clientData.email }, true);
-    const user = userRes.clientData;
-    user.status = 'CONFIRMED';
+    const userRes = (await objectRepository.select(
+      pool, { id: authData.userId }, userService.table,
+    ))[0];
+    userRes.status = 'CONFIRMED';
     await tokenService.deleteToken(pool, data);
-    await authService.markAsDeleted(pool, userRes.clientData, { userId: userRes.clientData.id, status: 'NEW' });
-    await userService.updateUser(pool, user);
-    return utils.responseObject(200, '', 'Email confirmed');
+    await authService.markAsDeleted(pool, userRes.clientData, { userId: userRes.id, status: 'NEW' });
+    await userService.updateUser(pool, userRes);
+    return utils.responseObject(200, '', {
+      message: 'Email confirmed',
+      redirectUrl: `${config.host}/login`,
+    });
   },
   async markAsDeleted(pool, user, whereObject) {
     try {
@@ -128,11 +153,11 @@ const authService = {
   },
   async createAuth(pool, authObject) {
     try {
-      await objectRepository.create(pool, authObject, authService.table);
-      return utils.responseObject(200, '', 'Auth object persisted successfully');
+      const authData = await objectRepository.create(pool, authObject, authService.table);
+      return utils.responseObject(200, authData, 'Auth object persisted successfully');
     } catch (err) {
       console.error(`Auth creation failed: ${err}`);
-      return utils.responseObject(500, '', 'Could not create new data!');
+      return utils.responseObject(500, authObject, 'Could not create new data!');
     }
   },
 };

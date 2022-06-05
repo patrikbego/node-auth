@@ -34,7 +34,7 @@ const userService = {
       }
     }
     console.log(`User creation failed: ${userData}`);
-    return utils.responseObject(400, '', 'cu: User creation failed. cu');
+    return utils.responseObject(400, '', 'User creation failed. ');
   },
   async createOrUpdateUser(pool, userData) { // TODO add a check on fields and do update in case user data has changed
     const newUser = {

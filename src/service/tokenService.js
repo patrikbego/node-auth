@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const utils = require('../utils');
 const objectRepository = require('../repository/objectRepository');
 const userService = require('./userService');
+const config = require('../../config.local');
 
 require('log-timestamp');
 
@@ -92,7 +93,7 @@ const tokenService = {
     return jwt.sign({
       id: user ? user.email : null,
       user,
-    }, 'my-secret',
+    }, config.hashingSecret,
     {
       expiresIn: 60 * 30,
     });
@@ -167,7 +168,7 @@ const tokenService = {
     // END TODO
   },
   decodeJwt(token) {
-    const decoded = jwt.verify(token, 'my-secret');
+    const decoded = jwt.verify(token, config.hashingSecret);
     console.log(decoded); // bar
     return decoded;
   },

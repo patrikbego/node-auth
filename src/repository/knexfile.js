@@ -46,7 +46,7 @@ module.exports = {
       host: 'localhost',
       database: 'test',
       password: 'test',
-      port: 5445,
+      port: 5444,
     },
     pool: {
       min: 2,

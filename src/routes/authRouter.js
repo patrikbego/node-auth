@@ -26,7 +26,8 @@ authRouter.route('/fb').post((req, res, next) => {
 },
 async (req, res, next) => {
   if (!req.user) {
-    return res.status(401).send(req.message ? { message: req.message } : errorRouteMessage);
+    return res.status(401)
+      .send(req.message ? { message: req.message } : errorRouteMessage);
   }
   next();
 }, tokenService.generateJwt, tokenService.sendJwt);
@@ -43,7 +44,8 @@ authRouter.route('/googl').post((req, res, next) => {
 },
 async (req, res, next) => {
   if (!req.user) {
-    return res.status(401).send(req.message ? { message: req.message } : errorRouteMessage);
+    return res.status(401)
+      .send(req.message ? { message: req.message } : errorRouteMessage);
   }
   next();
 }, tokenService.generateJwt, tokenService.sendJwt);
@@ -51,7 +53,8 @@ async (req, res, next) => {
 authRouter.post('/signin',
   check('email').isEmail().withMessage('Invalid email format'),
   async (req, res, next) => {
-    passport.authenticate('domain-token', { session: false, failWithError: true },
+    passport.authenticate('domain-token',
+      { session: false, failWithError: true },
       (err, user, info) => {
         console.log('domain passport user', user);
         console.info('domain passport info', info);
@@ -63,7 +66,8 @@ authRouter.post('/signin',
   },
   async (req, res, next) => {
     if (!req.user) {
-      return res.status(401).send(req.message ? { message: req.message } : errorRouteMessage);
+      return res.status(401)
+        .send(req.message ? { message: req.message } : errorRouteMessage);
     }
     next();
   }, tokenService.generateJwt, tokenService.sendJwt);
@@ -75,12 +79,20 @@ authRouter.post('/signup', async (req, res) => {
   res.status(resObject.code).json(resObject.clientData);
 });
 
-authRouter.post('/confirmEmail', async (req, res) => {
-  const resObject = await utils.requestWrapper(authService.confirmEmail,
-    req.body, req.headers,
-    tokenService.isRequestTokenValid, false);
-  res.status(resObject.code).json(resObject.clientData);
-});
+// is backend controlled api (no cleint), hence it is not handled with utils.requestWrapper ...
+authRouter.get('/confirmEmail',
+  async (req, res) => {
+    const resObject = await utils.requestWrapper(authService.confirmEmail,
+      req.query, req.headers,
+      tokenService.isRequestTokenValid, false);
+    // res.status(resObject.code).json(resObject.clientData);
+    // eslint-disable-next-line eqeqeq
+    if (resObject == 200) {
+      res.redirect(`http://localhost:3000/login?message=${resObject.clientData.message}`);
+    } else {
+      res.redirect(`http://localhost:3000/signup?message=${resObject.clientData.message}`);
+    }
+  });
 
 const refreshTokens = {};
 const SECRET = 'hard secret';
@@ -88,7 +100,8 @@ const SECRET = 'hard secret';
 authRouter.post('/token', (req, res, next) => {
   const { username } = req.body;
   const { refreshToken } = req.body;
-  if ((refreshToken in refreshTokens) && (refreshTokens[refreshToken] === username)) {
+  if ((refreshToken in refreshTokens)
+      && (refreshTokens[refreshToken] === username)) {
     const user = {
       username,
       role: 'admin',

@@ -20,13 +20,13 @@ describe('AuthService test', () => {
     done();
   });
 
-  test('sigunp login logout test', async () => {
+  test('Signup login logout test', async () => {
     const objectIns = to.user;
 
-    const signupRes = await authService.signUp(pool, objectIns, true);
+    const signupRes = await authService.signUp(pool, objectIns, false);
     expect(signupRes.code).toBe(200);
-    expect((await authService.getAllAuths(pool, { userId: 1, status: 'NEW' })).clientData.length)
-      .toBe(1);
+    const authObjects = (await authService.getAllAuths(pool, { userId: 1, status: 'NEW' })).clientData;
+    expect(authObjects.length).toBe(1);
 
     objectIns.id = 1; // quick assumption
     const updatedUser = await userService.getUser(pool, objectIns);
@@ -38,7 +38,11 @@ describe('AuthService test', () => {
     expect(parseInt(tokenDres.clientData.expires, 10)).toBeGreaterThan(Date.now());
     expect(tokenDres.clientData.id).toBeTruthy();
 
-    const confirmRes = await authService.confirmEmail(pool, tokenDres.clientData);
+    // this is just for test purposes (error handling should be better;
+    // 47 is hardcoded since we know what is being stored in DB).
+    // In live we get token from req param.
+    const authToken = authObjects[0].confirmationLink.substring(53);
+    const confirmRes = await authService.confirmEmail(pool, { token: authToken });
     expect(confirmRes.code).toBe(200);
 
     const loginRes = await authService.login(pool, objectIns);
@@ -46,7 +50,7 @@ describe('AuthService test', () => {
     const auths = await authService.getAllAuths(pool, { userId: 1, loginRetry: 1, status: 'DELETED' });
     expect(auths.clientData.length).toBe(1);
 
-    //TODO fix this
+    // TODO fix this
     // const tokenDresLog = await tokenService.getToken(pool, loginRes.clientData.token);
     // expect(tokenDresLog.clientData.id).toBeTruthy();
     //
