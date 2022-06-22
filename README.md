@@ -122,14 +122,14 @@ environments.<env> = {
 `node sonar-scanner.js`
 `eslint .`
 
-### Test execution
-`npm run test` or `jest --detectOpenHandles --collectCoverage .`
+### Test execution  
+`npm run test` or `jest --detectOpenHandles --collectCoverage .`  
 
 ### Running it with docker 
-`#docker rm -f $(docker ps -aq)`
-`#docker rmi -f $(docker images -a -q)`
-`docker build -t auth-node .`
-`docker run --name auth-node-api -d -p 8888:3005 auth-node`
+`#docker rm -f $(docker ps -aq)`  
+`#docker rmi -f $(docker images -a -q)`  
+`docker build -t auth-node .`  
+`docker run --name auth-node-api -d -p 8888:3005 auth-node`  
 
 # Run whole environment e2e locally (nginx, postgres, redis, auth-node...)
 Refer to automata/README.md.
