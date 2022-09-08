@@ -1,6 +1,6 @@
 # Authorization Nodejs Rest API
 
-This is a Auth Rest API server (node v15.3.0).
+This is an Auth Rest API server (node v15.3.0).
 The project contains following source files:
 ```
 .
@@ -75,7 +75,7 @@ printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltNam
 Update the config.local with private key and certificate
 ### Configure config.local.js
 Credentials need to be updated: 
-```javascript
+```env
 environments.<env> = {
   httpPort: xxx,
   httpsPort: xxx,
